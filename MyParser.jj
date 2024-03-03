@@ -1,0 +1,30 @@
+PARSER_BEGIN (MyParser)
+    class MyParser {}
+PARSER_END (MyParser)
+
+TOKEN : {
+    < #DIGIT: ["0"-"9"] >
+    | < INT: (<DIGIT>)+ >
+    | < BOOLEAN: (["0"-"1"])+ >
+}
+
+TOKEN: {
+    <DOT: ".">
+    | <COMMA: ",">
+    | <SCOLON: ";">
+    | <LPAR: "(">
+    | <RPAR: ")">
+    | <LBRACKET: "[">
+    | <RBRACKET: "]">
+    | <LBRACE: "{">
+    | <RBRACE: "}">
+}
+
+SKIP : {
+    " "
+    | "\t"
+    | "\n"
+    | "\r"
+    | <"//" (["a"-"z"])* (["0"-"9"])* ("\n")>
+    | <"/*" (["a"-"z"])* (["0"-"9"])* ("*")*  ("\n" | "\r" | "\r\n") "*/">
+}
