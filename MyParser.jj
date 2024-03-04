@@ -6,6 +6,32 @@ TOKEN : {
     < #DIGIT: ["0"-"9"] >
     | < INT: (<DIGIT>)+ >
     | < BOOLEAN: (["0"-"1"])+ >
+    | < IF: ("if") >
+    | < ELSE: ("else") >
+    | < WHILE: ("while") >
+    | < TRUE: ("true") >
+    | < FALSE: ("false") >
+    | < THIS: ("this") >
+    | < NEW: ("new") >
+    | < PLUS: ("+") >
+    | < MINUS: ("-") >
+    | < MULT: ("*") >
+    | < LOGIC_AND: ("&&") >
+    | < LOGIC_NOT: ("!") >
+    | < SMALLER: ("<") >
+    | < EQUAL: ("=") >
+    | < LENGHT: ("lenght") >
+    | < SYSTEM_OUT_PRINTLN: ("System.out.println") >
+    | < PUBLIC: ("public") >
+    | < STATIC: ("static") >
+    | < VOID: ("void") >
+    | < MAIN: ("main") >
+    | < STRING: ("String") >
+    | < CLASS: ("class") >
+    | < EXTENDS: ("extends") >
+    | < RETURN: ("return") >
+    | < IDENTIFIER: (["a"-"z"]) (["a"-"z"] ["0"-"9"])* >
+    | < EOF: ("") >
 }
 
 TOKEN: {
