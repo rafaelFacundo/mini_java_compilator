@@ -1,10 +1,23 @@
-PARSER_BEGIN (MyParser)
-    class MyParser {}
-PARSER_END (MyParser)
+PARSER_BEGIN(MyParser)
+
+public class MyParser {
+    public static void main(String[] args) throws ParseException {
+        MyParser lexer = new MyParser(System.in);
+        Token token;
+        try {
+            while ((token = lexer.getNextToken()).kind != 0) {
+                System.out.println(token.image);
+            }
+        } catch (TokenMgrError e) {
+            System.err.println("Error analyzing input: " + e.getMessage());
+        }
+    }
+}
+
+PARSER_END(MyParser)
 
 TOKEN : {
-    < #DIGIT: ["0"-"9"] >
-    | < INT: (<DIGIT>)+ >
+    < INT: "int" >
     | < BOOLEAN: (["0"-"1"])+ >
     | < IF: ("if") >
     | < ELSE: ("else") >
@@ -30,8 +43,10 @@ TOKEN : {
     | < CLASS: ("class") >
     | < EXTENDS: ("extends") >
     | < RETURN: ("return") >
-    | < IDENTIFIER: (["a"-"z"]) (["a"-"z"] ["0"-"9"])* >
-    | < EOF: ("") >
+    | <IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | "_")*>
+    | <#LETTER: ["a"-"z", "A"-"Z"] >
+    | <#DIGIT: ["0"-"9"]>
+    | <INTEGER: (["0"-"9"])+ >
 }
 
 TOKEN: {
