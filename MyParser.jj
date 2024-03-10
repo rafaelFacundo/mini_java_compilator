@@ -43,10 +43,10 @@ TOKEN : {
     | < CLASS: ("class") >
     | < EXTENDS: ("extends") >
     | < RETURN: ("return") >
-    | <IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | "_")*>
-    | <#LETTER: ["a"-"z", "A"-"Z"] >
-    | <#DIGIT: ["0"-"9"]>
-    | <INTEGER: (["0"-"9"])+ >
+    | < IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | "_")*>
+    | < #LETTER: ["a"-"z", "A"-"Z"] >
+    | < #DIGIT: ["0"-"9"]>
+    | < INTEGER_LITERAL: (["0"-"9"])+ >
 }
 
 TOKEN: {
@@ -68,4 +68,73 @@ SKIP : {
     | "\r"
     | <"//" (~["\n"])*>
     | <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+void MainClass():
+{}
+{
+    <CLASS> <IDENTIFIER> <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN>
+    <LPAR> <STRING> <LBRACKET> <RBRACKET> <IDENTIFIER> <RPAR> <LBRACE>
+    Statement() <RBRACE> <RBRACE>
+}
+
+void ClassDeclarion():
+{}
+{
+    <CLASS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
+    | 
+    <CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE> 
+}
+
+void VarDeclaration():
+{}
+{
+    Type() <IDENTIFIER> <SCOLON>
+}
+
+void MethodDeclaration():
+{}
+{
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> <RPAR> <LBRACE> (VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+    |
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* <RPAR> <LBRACE> (VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+}
+
+void Type():
+{}
+{
+    <INT> <RBRACKET> <LBRACKET> 
+    | <BOOLEAN>
+    | <INT>
+    | <IDENTIFIER>
+}
+
+void Statement():
+{}
+{
+    <LBRACE> (Statement())* <RBRACE>
+    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    | <WHILE> <LPAR>  Expression() <RPAR> Statement() 
+    | <SYSTEM_OUT_PRINTLN> <LPAR> Expression() <RPAR> <SCOLON>
+    | <IDENTIFIER> <EQUAL> Expression() <SCOLON>
+    | <IDENTIFIER> <LBRACKET> Expression() <RBRACKET> <EQUAL> Expression() <SCOLON>
+}
+
+void Expression():
+{}
+{
+    Expression() (<LOGIC_AND> | <SMALLER> | <PLUS> | <MINUS> | <MULT>) Expression()
+    | Expression() <LBRACKET> Expression() <RBRACKET>
+    | Expression() <DOT> <LENGHT>
+    | Expression() <DOT> <IDENTIFIER> <LPAR> <RPAR>
+    | Expression() <DOT> <IDENTIFIER> <LPAR> (Expression() (<COMMA> Expression())*) <RPAR>
+    | <INTEGER_LITERAL>
+    | <TRUE>
+    | <FALSE>
+    | <IDENTIFIER>
+    | <THIS>
+    | <NEW> <INT> <LBRACKET> Expression() <RBRACKET>
+    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
+    | <LOGIC_NOT> Expression()
+    | <LPAR> Expression() <RPAR>
 }
