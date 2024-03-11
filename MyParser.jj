@@ -81,6 +81,7 @@ void MainClass():
 void ClassDeclarion():
 {}
 {
+    LOOKAHEAD(3)
     <CLASS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
     | 
     <CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE> 
@@ -95,14 +96,16 @@ void VarDeclaration():
 void MethodDeclaration():
 {}
 {
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> <RPAR> <LBRACE> (VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+    LOOKAHEAD(2)
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
     |
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* <RPAR> <LBRACE> (VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
 }
 
 void Type():
 {}
 {
+    LOOKAHEAD(2)
     <INT> <RBRACKET> <LBRACKET> 
     | <BOOLEAN>
     | <INT>
@@ -112,29 +115,48 @@ void Type():
 void Statement():
 {}
 {
+    LOOKAHEAD(2)
     <LBRACE> (Statement())* <RBRACE>
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR>  Expression() <RPAR> Statement() 
     | <SYSTEM_OUT_PRINTLN> <LPAR> Expression() <RPAR> <SCOLON>
-    | <IDENTIFIER> <EQUAL> Expression() <SCOLON>
-    | <IDENTIFIER> <LBRACKET> Expression() <RBRACKET> <EQUAL> Expression() <SCOLON>
+    | LOOKAHEAD(2) <IDENTIFIER> <EQUAL> Expression() <SCOLON>
+    | LOOKAHEAD(2) <IDENTIFIER> <LBRACKET> Expression() <RBRACKET> <EQUAL> Expression() <SCOLON>
+}
+
+void Empty():
+{}
+{
+    {}
+}
+
+void Expression_prime():
+{}
+{
+    LOOKAHEAD(3)
+    <LOGIC_AND> Expression_prime()
+    | <SMALLER> Expression_prime()
+    | <PLUS> Expression_prime()
+    | <MINUS> Expression_prime()
+    | <MULT> Expression_prime()
+    | <LBRACKET> Expression() <RBRACKET> Expression_prime()
+    | LOOKAHEAD(2) <DOT> <LENGHT> Expression_prime()
+    | LOOKAHEAD(3) <DOT> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
+    | LOOKAHEAD(3) <DOT> <IDENTIFIER> <LPAR> Expression() (<COMMA> Expression()) <RPAR> Expression_prime()
+    | Empty()
 }
 
 void Expression():
 {}
 {
-    Expression() (<LOGIC_AND> | <SMALLER> | <PLUS> | <MINUS> | <MULT>) Expression()
-    | Expression() <LBRACKET> Expression() <RBRACKET>
-    | Expression() <DOT> <LENGHT>
-    | Expression() <DOT> <IDENTIFIER> <LPAR> <RPAR>
-    | Expression() <DOT> <IDENTIFIER> <LPAR> (Expression() (<COMMA> Expression())*) <RPAR>
-    | <INTEGER_LITERAL>
-    | <TRUE>
-    | <FALSE>
-    | <IDENTIFIER>
-    | <THIS>
-    | <NEW> <INT> <LBRACKET> Expression() <RBRACKET>
-    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
-    | <LOGIC_NOT> Expression()
-    | <LPAR> Expression() <RPAR>
+    
+    <TRUE> Expression_prime()
+    | <FALSE> Expression_prime()
+    | <IDENTIFIER> Expression_prime()
+    | <THIS> Expression_prime()
+    | <INTEGER_LITERAL> Expression_prime()
+    | LOOKAHEAD(2) <NEW> <INT> <LBRACKET> Expression() <RBRACKET> Expression_prime()
+    | LOOKAHEAD(2) <NEW> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
+    | <LOGIC_NOT> Expression() 
+    | <LPAR> Expression() <RPAR> Expression_prime()
 }

@@ -67,7 +67,7 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int DIGIT = 29;
   /** RegularExpression Id. */
-  int INTEGER = 30;
+  int INTEGER_LITERAL = 30;
   /** RegularExpression Id. */
   int DOT = 31;
   /** RegularExpression Id. */
@@ -122,7 +122,7 @@ public interface MyParserConstants {
     "<IDENTIFIER>",
     "<LETTER>",
     "<DIGIT>",
-    "<INTEGER>",
+    "<INTEGER_LITERAL>",
     "\".\"",
     "\",\"",
     "\";\"",
