@@ -70,6 +70,12 @@ SKIP : {
     | <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
 }
 
+void Program():
+{}
+{
+    MainClass() (ClassDecl())*
+}
+
 void MainClass():
 {}
 {
@@ -78,7 +84,7 @@ void MainClass():
     Statement() <RBRACE> <RBRACE>
 }
 
-void ClassDeclarion():
+void ClassDecl():
 {}
 {
     LOOKAHEAD(3)
@@ -96,10 +102,20 @@ void VarDeclaration():
 void MethodDeclaration():
 {}
 {
-    LOOKAHEAD(2)
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
-    |
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> FormalList() <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+}
+
+void FormalList():
+{}
+{
+    Type() <IDENTIFIER> (FormalRest())*
+    | Empty()
+}
+
+void FormalRest():
+{}
+{
+    <COMMA> Type() <IDENTIFIER>
 }
 
 void Type():
@@ -141,8 +157,7 @@ void Expression_prime():
     | <MULT> Expression_prime()
     | <LBRACKET> Expression() <RBRACKET> Expression_prime()
     | LOOKAHEAD(2) <DOT> <LENGHT> Expression_prime()
-    | LOOKAHEAD(3) <DOT> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
-    | LOOKAHEAD(3) <DOT> <IDENTIFIER> <LPAR> Expression() (<COMMA> Expression()) <RPAR> Expression_prime()
+    | LOOKAHEAD(2) <DOT> <IDENTIFIER> <LPAR> ExpressionList() <RPAR> 
     | Empty()
 }
 
@@ -159,4 +174,17 @@ void Expression():
     | LOOKAHEAD(2) <NEW> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
     | <LOGIC_NOT> Expression() 
     | <LPAR> Expression() <RPAR> Expression_prime()
+}
+
+void ExpressionList():
+{}
+{
+    Expression() (ExpressionRest())*
+    | Empty()
+}
+
+void ExpressionRest():
+{}
+{
+    <COMMA> Expression()
 }
