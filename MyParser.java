@@ -300,23 +300,28 @@ public class MyParser implements MyParserConstants {
   static final public void Expression_prime() throws ParseException {
     if (jj_2_7(3)) {
       jj_consume_token(LOGIC_AND);
+      LetT();
       Expression_prime();
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SMALLER:
         jj_consume_token(SMALLER);
+        LetT();
         Expression_prime();
         break;
       case PLUS:
         jj_consume_token(PLUS);
+        LetT();
         Expression_prime();
         break;
       case MINUS:
         jj_consume_token(MINUS);
+        LetT();
         Expression_prime();
         break;
       case MULT:
         jj_consume_token(MULT);
+        LetT();
         Expression_prime();
         break;
       case LBRACKET:
@@ -344,30 +349,42 @@ public class MyParser implements MyParserConstants {
     }
   }
 
-  static final public void Expression() throws ParseException {
+  static final public void LetTL() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case TRUE:
-      jj_consume_token(TRUE);
-      Expression_prime();
+    case MULT:
+      jj_consume_token(MULT);
+      LetF();
+      LetTL();
       break;
-    case FALSE:
-      jj_consume_token(FALSE);
-      Expression_prime();
-      break;
-    case IDENTIFIER:
-      jj_consume_token(IDENTIFIER);
-      Expression_prime();
-      break;
-    case THIS:
-      jj_consume_token(THIS);
-      Expression_prime();
-      break;
-    case INTEGER_LITERAL:
-      jj_consume_token(INTEGER_LITERAL);
-      Expression_prime();
+    case LOGIC_AND:
+      jj_consume_token(LOGIC_AND);
+      LetF();
+      LetTL();
       break;
     default:
       jj_la1[13] = jj_gen;
+      Empty();
+    }
+  }
+
+  static final public void LetT() throws ParseException {
+    LetF();
+    LetTL();
+  }
+
+  static final public void Expression() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case BOOLEAN:
+    case THIS:
+    case LOGIC_NOT:
+    case IDENTIFIER:
+    case INTEGER_LITERAL:
+    case LPAR:
+      LetT();
+      Expression_prime();
+      break;
+    default:
+      jj_la1[14] = jj_gen;
       if (jj_2_10(2)) {
         jj_consume_token(NEW);
         jj_consume_token(INT);
@@ -382,30 +399,45 @@ public class MyParser implements MyParserConstants {
         jj_consume_token(RPAR);
         Expression_prime();
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case LOGIC_NOT:
-          jj_consume_token(LOGIC_NOT);
-          Expression();
-          break;
-        case LPAR:
-          jj_consume_token(LPAR);
-          Expression();
-          jj_consume_token(RPAR);
-          Expression_prime();
-          break;
-        default:
-          jj_la1[14] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
+        jj_consume_token(-1);
+        throw new ParseException();
       }
+    }
+  }
+
+  static final public void LetF() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case INTEGER_LITERAL:
+      jj_consume_token(INTEGER_LITERAL);
+      break;
+    case BOOLEAN:
+      jj_consume_token(BOOLEAN);
+      break;
+    case IDENTIFIER:
+      jj_consume_token(IDENTIFIER);
+      break;
+    case THIS:
+      jj_consume_token(THIS);
+      break;
+    case LOGIC_NOT:
+      jj_consume_token(LOGIC_NOT);
+      Expression();
+      break;
+    case LPAR:
+      jj_consume_token(LPAR);
+      Expression();
+      jj_consume_token(RPAR);
+      break;
+    default:
+      jj_la1[15] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
   }
 
   static final public void ExpressionList() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case TRUE:
-    case FALSE:
+    case BOOLEAN:
     case THIS:
     case NEW:
     case LOGIC_NOT:
@@ -420,14 +452,14 @@ public class MyParser implements MyParserConstants {
           ;
           break;
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[16] = jj_gen;
           break label_10;
         }
         ExpressionRest();
       }
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[17] = jj_gen;
       Empty();
     }
   }
@@ -514,100 +546,27 @@ public class MyParser implements MyParserConstants {
     finally { jj_save(10, xla); }
   }
 
-  static private boolean jj_3_4() {
-    if (jj_scan_token(LBRACE)) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_12()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(RBRACE)) return true;
+  static private boolean jj_3R_35() {
+    if (jj_3R_13()) return true;
     return false;
   }
 
-  static private boolean jj_3R_15() {
+  static private boolean jj_3R_34() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_4()) {
+    if (jj_3R_35()) {
     jj_scanpos = xsp;
-    if (jj_3R_22()) {
+    if (jj_3_10()) {
     jj_scanpos = xsp;
-    if (jj_3R_23()) {
-    jj_scanpos = xsp;
-    if (jj_3R_24()) {
-    jj_scanpos = xsp;
-    if (jj_3_5()) {
-    jj_scanpos = xsp;
-    if (jj_3_6()) return true;
-    }
-    }
-    }
+    if (jj_3_11()) return true;
     }
     }
     return false;
   }
 
-  static private boolean jj_3R_33() {
-    if (jj_scan_token(LPAR)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_32() {
-    if (jj_scan_token(LOGIC_NOT)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_11() {
-    if (jj_scan_token(NEW)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_10() {
-    if (jj_scan_token(NEW)) return true;
-    if (jj_scan_token(INT)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_31() {
-    if (jj_scan_token(INTEGER_LITERAL)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_30() {
-    if (jj_scan_token(THIS)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_29() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_28() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_3() {
-    if (jj_scan_token(INT)) return true;
-    if (jj_scan_token(RBRACKET)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_14() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_3()) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(2)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(1)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(27)) return true;
-    }
-    }
-    }
+  static private boolean jj_3R_13() {
+    if (jj_3R_17()) return true;
+    if (jj_3R_18()) return true;
     return false;
   }
 
@@ -616,44 +575,36 @@ public class MyParser implements MyParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_27() {
-    if (jj_scan_token(TRUE)) return true;
+  static private boolean jj_3R_32() {
+    if (jj_3R_33()) return true;
     return false;
   }
 
-  static private boolean jj_3R_25() {
+  static private boolean jj_3R_31() {
+    if (jj_scan_token(LOGIC_AND)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_18() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_27()) {
-    jj_scanpos = xsp;
-    if (jj_3R_28()) {
-    jj_scanpos = xsp;
-    if (jj_3R_29()) {
-    jj_scanpos = xsp;
     if (jj_3R_30()) {
     jj_scanpos = xsp;
     if (jj_3R_31()) {
     jj_scanpos = xsp;
-    if (jj_3_10()) {
-    jj_scanpos = xsp;
-    if (jj_3_11()) {
-    jj_scanpos = xsp;
-    if (jj_3R_32()) {
-    jj_scanpos = xsp;
-    if (jj_3R_33()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
+    if (jj_3R_32()) return true;
     }
     }
     return false;
   }
 
-  static private boolean jj_3R_21() {
-    if (jj_3R_26()) return true;
+  static private boolean jj_3R_30() {
+    if (jj_scan_token(MULT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_24() {
+    if (jj_3R_33()) return true;
     return false;
   }
 
@@ -669,85 +620,75 @@ public class MyParser implements MyParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_20() {
+  static private boolean jj_3R_23() {
     if (jj_scan_token(LBRACKET)) return true;
-    if (jj_3R_25()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_22() {
+    if (jj_scan_token(MULT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_21() {
+    if (jj_scan_token(MINUS)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_20() {
+    if (jj_scan_token(PLUS)) return true;
     return false;
   }
 
   static private boolean jj_3R_19() {
-    if (jj_scan_token(MULT)) return true;
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_18() {
-    if (jj_scan_token(MINUS)) return true;
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_17() {
-    if (jj_scan_token(PLUS)) return true;
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_16() {
     if (jj_scan_token(SMALLER)) return true;
-    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_14() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_23()) {
+    jj_scanpos = xsp;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3_9()) {
+    jj_scanpos = xsp;
+    if (jj_3R_24()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
     return false;
   }
 
   static private boolean jj_3_7() {
     if (jj_scan_token(LOGIC_AND)) return true;
     if (jj_3R_13()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_13() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_16()) {
-    jj_scanpos = xsp;
-    if (jj_3R_17()) {
-    jj_scanpos = xsp;
-    if (jj_3R_18()) {
-    jj_scanpos = xsp;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
-    if (jj_3_8()) {
-    jj_scanpos = xsp;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3R_21()) return true;
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_26() {
-    return false;
-  }
-
-  static private boolean jj_3R_11() {
     if (jj_3R_14()) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_33() {
     return false;
   }
 
   static private boolean jj_3R_12() {
-    if (jj_3R_15()) return true;
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -763,18 +704,119 @@ public class MyParser implements MyParserConstants {
     return false;
   }
 
-  static private boolean jj_3R_24() {
+  static private boolean jj_3R_27() {
     if (jj_scan_token(SYSTEM_OUT_PRINTLN)) return true;
     return false;
   }
 
-  static private boolean jj_3R_23() {
+  static private boolean jj_3R_26() {
     if (jj_scan_token(WHILE)) return true;
     return false;
   }
 
-  static private boolean jj_3R_22() {
+  static private boolean jj_3R_25() {
     if (jj_scan_token(IF)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_16() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) {
+    jj_scanpos = xsp;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3_5()) {
+    jj_scanpos = xsp;
+    if (jj_3_6()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  static private boolean jj_3_4() {
+    if (jj_scan_token(LBRACE)) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_12()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(RBRACE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_15() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_3()) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(7)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(1)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(27)) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  static private boolean jj_3_3() {
+    if (jj_scan_token(INT)) return true;
+    if (jj_scan_token(RBRACKET)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_29() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_34()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_28() {
+    if (jj_scan_token(LOGIC_NOT)) return true;
+    if (jj_3R_34()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11() {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_17() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(30)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(7)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(27)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(8)) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  static private boolean jj_3_11() {
+    if (jj_scan_token(NEW)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
@@ -782,6 +824,12 @@ public class MyParser implements MyParserConstants {
     if (jj_scan_token(CLASS)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(LBRACE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_10() {
+    if (jj_scan_token(NEW)) return true;
+    if (jj_scan_token(INT)) return true;
     return false;
   }
 
@@ -797,7 +845,7 @@ public class MyParser implements MyParserConstants {
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[17];
+  static final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -805,10 +853,10 @@ public class MyParser implements MyParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1000000,0x8000006,0x80000,0x8000006,0x80000,0x1000000,0x8040028,0x0,0x8000006,0x8000006,0x8040028,0x40028,0x9c00,0x480001c0,0x4000,0x0,0x480043c0,};
+      jj_la1_0 = new int[] {0x1000000,0x8000082,0x80000,0x8000082,0x80000,0x1000000,0x8040014,0x0,0x8000082,0x8000082,0x8040014,0x40014,0x9c00,0x3000,0x48004180,0x48004180,0x0,0x48004380,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x40,0x1,0x0,0x0,0x40,0x0,0x10,0x0,0x4,0x1,0x4,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x40,0x1,0x0,0x0,0x40,0x0,0x10,0x0,0x4,0x4,0x1,0x4,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[11];
   static private boolean jj_rescan = false;
@@ -832,7 +880,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -847,7 +895,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -865,7 +913,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -876,7 +924,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -893,7 +941,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -903,7 +951,7 @@ public class MyParser implements MyParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1023,7 +1071,7 @@ public class MyParser implements MyParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 18; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

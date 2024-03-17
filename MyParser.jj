@@ -18,12 +18,12 @@ PARSER_END(MyParser)
 
 TOKEN : {
     < INT: "int" >
-    | < BOOLEAN: (["0"-"1"])+ >
     | < IF: ("if") >
     | < ELSE: ("else") >
     | < WHILE: ("while") >
     | < TRUE: ("true") >
     | < FALSE: ("false") >
+    | < BOOLEAN: ("boolean") >
     | < THIS: ("this") >
     | < NEW: ("new") >
     | < PLUS: ("+") >
@@ -150,30 +150,49 @@ void Expression_prime():
 {}
 {
     LOOKAHEAD(3)
-    <LOGIC_AND> Expression_prime()
-    | <SMALLER> Expression_prime()
-    | <PLUS> Expression_prime()
-    | <MINUS> Expression_prime()
-    | <MULT> Expression_prime()
+    <LOGIC_AND> LetT() Expression_prime()
+    | <SMALLER> LetT() Expression_prime()
+    | <PLUS> LetT() Expression_prime()
+    | <MINUS> LetT() Expression_prime()
+    | <MULT> LetT() Expression_prime()
     | <LBRACKET> Expression() <RBRACKET> Expression_prime()
     | LOOKAHEAD(2) <DOT> <LENGHT> Expression_prime()
     | LOOKAHEAD(2) <DOT> <IDENTIFIER> <LPAR> ExpressionList() <RPAR> 
     | Empty()
 }
 
+void LetTL():
+{}
+{
+    <MULT> LetF() LetTL()
+    | <LOGIC_AND> LetF() LetTL()
+    | Empty()
+
+}
+
+void LetT():
+{}
+{
+    LetF() LetTL()
+}
+
 void Expression():
 {}
 {
-    
-    <TRUE> Expression_prime()
-    | <FALSE> Expression_prime()
-    | <IDENTIFIER> Expression_prime()
-    | <THIS> Expression_prime()
-    | <INTEGER_LITERAL> Expression_prime()
+    LetT() Expression_prime()
     | LOOKAHEAD(2) <NEW> <INT> <LBRACKET> Expression() <RBRACKET> Expression_prime()
     | LOOKAHEAD(2) <NEW> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
-    | <LOGIC_NOT> Expression() 
-    | <LPAR> Expression() <RPAR> Expression_prime()
+}
+
+void LetF():
+{}
+{
+    <INTEGER_LITERAL>
+    | <BOOLEAN>
+    | <IDENTIFIER>
+    | <THIS>
+    | <LOGIC_NOT> Expression()
+    | <LPAR> Expression() <RPAR>
 }
 
 void ExpressionList():

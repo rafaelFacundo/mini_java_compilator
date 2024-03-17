@@ -11,17 +11,17 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int INT = 1;
   /** RegularExpression Id. */
-  int BOOLEAN = 2;
+  int IF = 2;
   /** RegularExpression Id. */
-  int IF = 3;
+  int ELSE = 3;
   /** RegularExpression Id. */
-  int ELSE = 4;
+  int WHILE = 4;
   /** RegularExpression Id. */
-  int WHILE = 5;
+  int TRUE = 5;
   /** RegularExpression Id. */
-  int TRUE = 6;
+  int FALSE = 6;
   /** RegularExpression Id. */
-  int FALSE = 7;
+  int BOOLEAN = 7;
   /** RegularExpression Id. */
   int THIS = 8;
   /** RegularExpression Id. */
@@ -94,12 +94,12 @@ public interface MyParserConstants {
   String[] tokenImage = {
     "<EOF>",
     "\"int\"",
-    "<BOOLEAN>",
     "\"if\"",
     "\"else\"",
     "\"while\"",
     "\"true\"",
     "\"false\"",
+    "\"boolean\"",
     "\"this\"",
     "\"new\"",
     "\"+\"",
