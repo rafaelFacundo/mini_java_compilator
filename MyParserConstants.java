@@ -11,17 +11,17 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int INT = 1;
   /** RegularExpression Id. */
-  int IF = 2;
+  int BOOLEAN = 2;
   /** RegularExpression Id. */
-  int ELSE = 3;
+  int IF = 3;
   /** RegularExpression Id. */
-  int WHILE = 4;
+  int ELSE = 4;
   /** RegularExpression Id. */
-  int TRUE = 5;
+  int WHILE = 5;
   /** RegularExpression Id. */
-  int FALSE = 6;
+  int TRUE = 6;
   /** RegularExpression Id. */
-  int BOOLEAN = 7;
+  int FALSE = 7;
   /** RegularExpression Id. */
   int THIS = 8;
   /** RegularExpression Id. */
@@ -41,7 +41,7 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int EQUAL = 16;
   /** RegularExpression Id. */
-  int LENGHT = 17;
+  int LENGTH = 17;
   /** RegularExpression Id. */
   int SYSTEM_OUT_PRINTLN = 18;
   /** RegularExpression Id. */
@@ -94,12 +94,12 @@ public interface MyParserConstants {
   String[] tokenImage = {
     "<EOF>",
     "\"int\"",
+    "\"boolean\"",
     "\"if\"",
     "\"else\"",
     "\"while\"",
     "\"true\"",
     "\"false\"",
-    "\"boolean\"",
     "\"this\"",
     "\"new\"",
     "\"+\"",
@@ -109,7 +109,7 @@ public interface MyParserConstants {
     "\"!\"",
     "\"<\"",
     "\"=\"",
-    "\"lenght\"",
+    "\"length\"",
     "\"System.out.println\"",
     "\"public\"",
     "\"static\"",

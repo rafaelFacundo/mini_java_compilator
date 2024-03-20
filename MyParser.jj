@@ -1,16 +1,15 @@
 PARSER_BEGIN(MyParser)
 
 public class MyParser {
-    public static void main(String[] args) throws ParseException {
-        MyParser lexer = new MyParser(System.in);
-        Token token;
-        try {
-            while ((token = lexer.getNextToken()).kind != 0) {
-                System.out.println(token.image);
-            }
-        } catch (TokenMgrError e) {
-            System.err.println("Error analyzing input: " + e.getMessage());
-        }
+    public static void main(String[] args) throws ParseException, TokenMgrError{
+    try {
+        java.io.FileInputStream file = new java.io.FileInputStream(new java.io.File(args[0]));
+        new MyParser(file).Program();
+        System.out.println("Success");
+    } catch(Exception e) {
+        System.out.println(e);
+        System.out.println("Failed");
+    }
     }
 }
 
@@ -18,12 +17,12 @@ PARSER_END(MyParser)
 
 TOKEN : {
     < INT: "int" >
+    | < BOOLEAN: ("boolean") >
     | < IF: ("if") >
     | < ELSE: ("else") >
     | < WHILE: ("while") >
     | < TRUE: ("true") >
     | < FALSE: ("false") >
-    | < BOOLEAN: ("boolean") >
     | < THIS: ("this") >
     | < NEW: ("new") >
     | < PLUS: ("+") >
@@ -33,7 +32,7 @@ TOKEN : {
     | < LOGIC_NOT: ("!") >
     | < SMALLER: ("<") >
     | < EQUAL: ("=") >
-    | < LENGHT: ("lenght") >
+    | < LENGTH: ("length") >
     | < SYSTEM_OUT_PRINTLN: ("System.out.println") >
     | < PUBLIC: ("public") >
     | < STATIC: ("static") >
@@ -122,7 +121,7 @@ void Type():
 {}
 {
     LOOKAHEAD(2)
-    <INT> <RBRACKET> <LBRACKET> 
+    <INT> <LBRACKET> <RBRACKET> 
     | <BOOLEAN>
     | <INT>
     | <IDENTIFIER>
@@ -150,49 +149,30 @@ void Expression_prime():
 {}
 {
     LOOKAHEAD(3)
-    <LOGIC_AND> LetT() Expression_prime()
-    | <SMALLER> LetT() Expression_prime()
-    | <PLUS> LetT() Expression_prime()
-    | <MINUS> LetT() Expression_prime()
-    | <MULT> LetT() Expression_prime()
+    <LOGIC_AND> Expression() Expression_prime()
+    | <SMALLER> Expression() Expression_prime()
+    | <PLUS> Expression() Expression_prime()
+    | <MINUS> Expression() Expression_prime()
+    | <MULT> Expression() Expression_prime()
     | <LBRACKET> Expression() <RBRACKET> Expression_prime()
-    | LOOKAHEAD(2) <DOT> <LENGHT> Expression_prime()
-    | LOOKAHEAD(2) <DOT> <IDENTIFIER> <LPAR> ExpressionList() <RPAR> 
+    | LOOKAHEAD(2) <DOT> <LENGTH> Expression_prime()
+    | LOOKAHEAD(2) <DOT> <IDENTIFIER> <LPAR> ExpressionList() <RPAR> Expression_prime()
     | Empty()
-}
-
-void LetTL():
-{}
-{
-    <MULT> LetF() LetTL()
-    | <LOGIC_AND> LetF() LetTL()
-    | Empty()
-
-}
-
-void LetT():
-{}
-{
-    LetF() LetTL()
 }
 
 void Expression():
 {}
 {
-    LetT() Expression_prime()
+    
+    <TRUE> Expression_prime()
+    | <FALSE> Expression_prime()
+    | <IDENTIFIER> Expression_prime()
+    | <THIS> Expression_prime()
+    | <INTEGER_LITERAL> Expression_prime()
     | LOOKAHEAD(2) <NEW> <INT> <LBRACKET> Expression() <RBRACKET> Expression_prime()
     | LOOKAHEAD(2) <NEW> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
-}
-
-void LetF():
-{}
-{
-    <INTEGER_LITERAL>
-    | <BOOLEAN>
-    | <IDENTIFIER>
-    | <THIS>
-    | <LOGIC_NOT> Expression()
-    | <LPAR> Expression() <RPAR>
+    | <LOGIC_NOT> Expression() 
+    | <LPAR> Expression() <RPAR> Expression_prime()
 }
 
 void ExpressionList():
