@@ -208,3 +208,162 @@ void ExpressionRest():
 {
     <COMMA> Expression()
 }
+
+
+
+Exp Start():
+    {Exp e;}
+    {e=Exp() {return e;}}
+
+Exp Exp():
+    {Exp e1, e2;}
+    {
+        e1=Term()
+        (
+            "+" e2=Term() {e1=new PlusExp(e1,e2);} |
+            "-" e2=Term() {e1=new MinusExp(e1,e2);}
+        )*
+        {return e1}
+    }
+
+Exp Term():
+    {Exp e1, e2;}
+    {
+        e1=Factor()
+        (
+            "*" e2=Factor() {e1=new TimesExp(e1,e2);} |
+            "/" e2=Factor() {e1=new DivideExp(e1,e2);}
+        )*
+        {return e1}
+    }
+
+Exp Factor():
+    {Token t; Exp e;}
+    {
+        (
+            t=<IDENTIFIER>      {return new Identifier(t.image);}       |
+            t=<INTEGER_LITERAL> {return new IntegerLiteral(t.image);}   |
+            "(" e=Exp() ")"     {return e}
+        )
+    }
+
+
+
+
+public interface Visitor {
+    public int visit(PlusExp n);
+    public int visit(MinusExp n);
+    public int visit(TimesExp n);
+    public int visit(DivideExp n);
+    public int visit(Identifier n);
+    public int visit(IntegerLiteral n);
+}
+
+public class Interpreter implements Visitor {
+    public int visit(PlusExp n) {
+        return n.e1.accept(this) + n.e2.accept(this);
+    }
+
+    public int visit(MinusExp n) {
+        return n.e1.accept(this) - n.e2.accept(this);
+    }
+
+    public int visit(TimesExp n) {
+        return n.e1.accept(this) * n.e2.accept(this);
+    }
+
+    public int visit(DivideExp n) {
+        return n.e1.accept(this) / n.e2.accept(this);
+    }
+
+    public int visit(Identifier n) {
+        return lookup(n.f0);
+    }
+
+    public int visit(IntegerLiteral n) {
+        return Integer.parseInt(n.f0);
+    }
+
+}
+
+
+public abstract class Exp {
+    public abstract int accept(Visitor v);
+}
+
+public class PlusExp extends Exp {
+    public Exp e1, e2;
+
+    public PlusExp(Exp a1, Exp a2) {
+         e1=a1;
+         e2=a2;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
+public class MinusExp extends Exp {
+    public Exp e1, e2;
+
+    public MinusExp(Exp a1, Exp a2) {
+         e1=a1;
+         e2=a2;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
+public class TimesExp extends Exp {
+    public Exp e1, e2;
+
+    public TimesExp(Exp a1, Exp a2) {
+         e1=a1;
+         e2=a2;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
+public class DivideExp extends Exp {
+    public Exp e1, e2;
+
+    public DivideExp(Exp a1, Exp a2) {
+         e1=a1;
+         e2=a2;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
+public class Identifier extends Exp {
+    public String f0;
+
+    public Identifier(String n0) {
+        f0=n0;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
+public class IntegerLiteral extends Exp {
+    public String f0;
+
+    public IntegerLiteral(String n0) {
+        f0=n0;
+    }
+
+    public int accept(Visitor v) {
+        return v.visit(this);
+    }
+}
+
