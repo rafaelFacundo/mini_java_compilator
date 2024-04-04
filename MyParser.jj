@@ -14,6 +14,66 @@ public class MyParser {
     }
 }
 
+public class typeCheckingVisitor extends Visitor {
+    public void visit (VarDeclaration n) {
+        Type t = n.t.accept(this);
+        String id = n.i.toString();
+
+        if (currMethod == null) {
+            if (!currClass.addVar(id,t)) {
+                error.complain(id + "is already defined in " + currClass.getId());
+            }
+        } else if (!currMethod.addVar(id,t)) {
+            error.complain(id + "is already defined in " + currMethod.getId());
+        }
+    }
+
+    public Type visit(Plus n) {
+        if ( !(n.e1.accept(this) istanceof IntegerType) ) {
+            error.complain("Left side of LessThan must be of type integer");
+        }
+        if ( !(n.e2.accept(this) istanceof IntegerType) ) {
+            error.complain("Right side of LessThan must be of type integer");
+        }
+    }
+
+    public Type visit(Minus n) {
+        if ( !(n.e1.accept(this) istanceof IntegerType) ) {
+            error.complain("Left side of LessThan must be of type integer");
+        }
+        if ( !(n.e2.accept(this) istanceof IntegerType) ) {
+            error.complain("Right side of LessThan must be of type integer");
+        }
+    }
+
+    public Type visit(Times n) {
+        if ( !(n.e1.accept(this) istanceof IntegerType) ) {
+            error.complain("Left side of LessThan must be of type integer");
+        }
+        if ( !(n.e2.accept(this) istanceof IntegerType) ) {
+            error.complain("Right side of LessThan must be of type integer");
+        }
+    }
+
+    public Type visit(Smaller n) {
+        if ( !(n.e1.accept(this) istanceof IntegerType) ) {
+            error.complain("Left side of LessThan must be of type integer");
+        }
+        if ( !(n.e2.accept(this) istanceof IntegerType) ) {
+            error.complain("Right side of LessThan must be of type integer");
+        }
+    }
+}
+
+class ErrorMessage {
+    boolean anyErrors;
+    void complain(errorMessage) {
+        anyErrors = true;
+        System.out.println(errorMessage);
+    }
+}
+
+
 PARSER_END(MyParser)
 
 TOKEN : {
