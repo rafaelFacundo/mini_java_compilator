@@ -40,7 +40,9 @@ TOKEN : {
     | < MAIN: ("main") >
     | < STRING: ("String") >
     | < CLASS: ("class") >
+    | < INTERFACE: ("interface") >
     | < EXTENDS: ("extends") >
+    | < IMPLEMENTS: ("implements") >
     | < RETURN: ("return") >
     | < IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | "_")*>
     | < #LETTER: ["a"-"z", "A"-"Z"] >
@@ -89,7 +91,16 @@ void ClassDecl():
     LOOKAHEAD(3)
     <CLASS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
     | 
-    <CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE> 
+    <CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
+    |
+    <CLASS> <IDENTIFIER> <IMPLEMENTS> <IDENTIFIER>
+}
+
+void InterfaceDecl():
+{}
+{
+    LOOKAHEAD(3)
+    <INTERFACE> <IDENTIFIER>
 }
 
 void VarDeclaration():
@@ -223,7 +234,7 @@ Exp Exp():
             "+" e2=Term() {e1=new PlusExp(e1,e2);} |
             "-" e2=Term() {e1=new MinusExp(e1,e2);}
         )*
-        {return e1}
+        {return e1;}
     }
 
 Exp Term():
@@ -234,7 +245,7 @@ Exp Term():
             "*" e2=Factor() {e1=new TimesExp(e1,e2);} |
             "/" e2=Factor() {e1=new DivideExp(e1,e2);}
         )*
-        {return e1}
+        {return e1;}
     }
 
 Exp Factor():
@@ -243,7 +254,7 @@ Exp Factor():
         (
             t=<IDENTIFIER>      {return new Identifier(t.image);}       |
             t=<INTEGER_LITERAL> {return new IntegerLiteral(t.image);}   |
-            "(" e=Exp() ")"     {return e}
+            "(" e=Exp() ")"     {return e;}
         )
     }
 
