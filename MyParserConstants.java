@@ -57,35 +57,39 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int CLASS = 24;
   /** RegularExpression Id. */
-  int EXTENDS = 25;
+  int INTERFACE = 25;
   /** RegularExpression Id. */
-  int RETURN = 26;
+  int EXTENDS = 26;
   /** RegularExpression Id. */
-  int IDENTIFIER = 27;
+  int IMPLEMENTS = 27;
   /** RegularExpression Id. */
-  int LETTER = 28;
+  int RETURN = 28;
   /** RegularExpression Id. */
-  int DIGIT = 29;
+  int IDENTIFIER = 29;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 30;
+  int LETTER = 30;
   /** RegularExpression Id. */
-  int DOT = 31;
+  int DIGIT = 31;
   /** RegularExpression Id. */
-  int COMMA = 32;
+  int INTEGER_LITERAL = 32;
   /** RegularExpression Id. */
-  int SCOLON = 33;
+  int DOT = 33;
   /** RegularExpression Id. */
-  int LPAR = 34;
+  int COMMA = 34;
   /** RegularExpression Id. */
-  int RPAR = 35;
+  int SCOLON = 35;
   /** RegularExpression Id. */
-  int LBRACKET = 36;
+  int LPAR = 36;
   /** RegularExpression Id. */
-  int RBRACKET = 37;
+  int RPAR = 37;
   /** RegularExpression Id. */
-  int LBRACE = 38;
+  int LBRACKET = 38;
   /** RegularExpression Id. */
-  int RBRACE = 39;
+  int RBRACKET = 39;
+  /** RegularExpression Id. */
+  int LBRACE = 40;
+  /** RegularExpression Id. */
+  int RBRACE = 41;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -117,7 +121,9 @@ public interface MyParserConstants {
     "\"main\"",
     "\"String\"",
     "\"class\"",
+    "\"interface\"",
     "\"extends\"",
+    "\"implements\"",
     "\"return\"",
     "<IDENTIFIER>",
     "<LETTER>",
@@ -136,8 +142,8 @@ public interface MyParserConstants {
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 44>",
-    "<token of kind 45>",
+    "<token of kind 46>",
+    "<token of kind 47>",
   };
 
 }

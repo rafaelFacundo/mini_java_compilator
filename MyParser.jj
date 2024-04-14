@@ -1,10 +1,18 @@
 PARSER_BEGIN(MyParser)
 
+import syntaxtree.*;
+import syntaxtree.visitor.*;
+import java.io.IOException;
+
 public class MyParser {
-    public static void main(String[] args) throws ParseException, TokenMgrError{
+    public static void main(String[] args) throws ParseException, TokenMgrError, IOException{
     try {
         java.io.FileInputStream file = new java.io.FileInputStream(new java.io.File(args[0]));
-        new MyParser(file).Program();
+        Program p = new MyParser(file).Prog();
+        
+        PrettyPrintVisitor ppvisitor = new PrettyPrintVisitor();
+        p.accept(ppvisitor);
+        
         System.out.println("Success");
     } catch(Exception e) {
         System.out.println(e);
@@ -71,310 +79,153 @@ SKIP : {
     | <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
 }
 
-void Program():
-{}
+Program Prog() :
 {
-    MainClass() (ClassDecl())*
+    MainClass mc;
+    ClassDecl cd;
+    ClassDeclList cl = new ClassDeclList();
+}
+{
+    mc = MainClass()
+    (cd = ClassDeclaration() {cl.addElement(cd);})*
+    <EOF>
+
+    {return new Program(mc, cl);}
 }
 
-void MainClass():
-{}
+MainClass MainClass() :
 {
-    <CLASS> <IDENTIFIER> <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN>
-    <LPAR> <STRING> <LBRACKET> <RBRACKET> <IDENTIFIER> <RPAR> <LBRACE>
-    Statement() <RBRACE> <RBRACE>
+    Identifier ci, ma;
+    Statement s;
+}
+{
+    <CLASS> ci = ID() <LBRACE>
+        <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LBRACKET> <RBRACKET> ma = ID() <RPAR> <LBRACE>
+            s = Statement()
+        <RBRACE>
+    <RBRACE>
+
+    {return new MainClass(ci, ma, s);}
 }
 
-void ClassDecl():
-{}
+ClassDecl ClassDeclaration() :
 {
-    LOOKAHEAD(3)
-    <CLASS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
-    | 
-    <CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDeclaration())* (MethodDeclaration())* <RBRACE>
-    |
-    <CLASS> <IDENTIFIER> <IMPLEMENTS> <IDENTIFIER>
+    Identifier id1, id2 = null;
+    VarDecl vd; VarDeclList vl = new VarDeclList();
+    MethodDecl md; MethodDeclList ml = new MethodDeclList();
+}
+{
+    <CLASS> id1 = ID()
+    (<EXTENDS> id2 = ID())? <LBRACE>
+        (vd = VarDeclaration() {vl.addElement(vd);})* (md = MethodDeclaration() {ml.addElement(md);})*
+    <RBRACE>
+
+    {return (id2 == null) ? new ClassDeclSimple(id1, vl, ml) : new ClassDeclExtends(id1, id2, vl, ml);}
 }
 
-void InterfaceDecl():
-{}
+VarDecl VarDeclaration() :
 {
-    LOOKAHEAD(3)
-    <INTERFACE> <IDENTIFIER>
+    Type t; Identifier i;
+}
+{
+    t = Type() i = ID() <SCOLON>
+
+    {return new VarDecl(t, i);}
 }
 
-void VarDeclaration():
-{}
+MethodDecl MethodDeclaration() :
 {
-    Type() <IDENTIFIER> <SCOLON>
+    Type t, taux; Identifier i, iaux; Exp e; MethodDecl md; VarDecl vd; Statement st;
+
+    FormalList fl = new FormalList(); VarDeclList vl = new VarDeclList(); StatementList sl = new StatementList();
+}
+{
+    <PUBLIC> t = Type() i = ID() <LPAR>
+        (taux = Type() iaux = ID() {fl.addElement(new Formal(taux, iaux));} ( "," taux = Type() iaux = ID() {fl.addElement(new Formal(taux, iaux));})* )?
+    <RPAR> <LBRACE>
+        (LOOKAHEAD(2) vd = VarDeclaration() {vl.addElement(vd);})*
+        (st = Statement() {sl.addElement(st);})*
+        <RETURN> e = Expression() <SCOLON>
+    <RBRACE>
+    {return new MethodDecl(t, i, fl, vl, sl, e);}
 }
 
-void MethodDeclaration():
-{}
+Type Type() :
 {
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> FormalList() <RPAR> <LBRACE> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SCOLON> <RBRACE>
+    Identifier id;
 }
-
-void FormalList():
-{}
-{
-    Type() <IDENTIFIER> (FormalRest())*
-    | Empty()
-}
-
-void FormalRest():
-{}
-{
-    <COMMA> Type() <IDENTIFIER>
-}
-
-void Type():
-{}
 {
     LOOKAHEAD(2)
-    <INT> <LBRACKET> <RBRACKET> 
-    | <BOOLEAN>
-    | <INT>
-    | <IDENTIFIER>
+    <INT> <LBRACKET> <RBRACKET> {return new IntArrayType();}
+    | <INT> {return new IntegerType();}
+    | <BOOLEAN> {return new BooleanType();}
+    | id = ID() {return new IdentifierType(id.toString());} // ver se da certo
 }
 
-void Statement():
-{}
+Statement Statement() :
 {
+   Statement s, s2;
+   Exp e, e2; Identifier id;
+   StatementList sl = new StatementList();
+}
+{   
     LOOKAHEAD(2)
-    <LBRACE> (Statement())* <RBRACE>
-    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
-    | <WHILE> <LPAR>  Expression() <RPAR> Statement() 
-    | <SYSTEM_OUT_PRINTLN> <LPAR> Expression() <RPAR> <SCOLON>
-    | LOOKAHEAD(2) <IDENTIFIER> <EQUAL> Expression() <SCOLON>
-    | LOOKAHEAD(2) <IDENTIFIER> <LBRACKET> Expression() <RBRACKET> <EQUAL> Expression() <SCOLON>
+    <LBRACE> (s = Statement() {sl.addElement(s);})* <RBRACE> { return new Block(sl); }
+    | <IF> <LPAR> e = Expression() <RPAR> s = Statement() <ELSE> s2 = Statement() { return new If(e, s, s2); }
+    | <WHILE> <LPAR> e = Expression() <RPAR> s = Statement() { return new While(e, s); }
+    | <SYSTEM_OUT_PRINTLN> <LPAR> e = Expression() <RPAR> <SCOLON> { return new Print(e); }
+    | LOOKAHEAD(2) 
+     id = ID() <EQUAL> e = Expression() <SCOLON> { return new Assign(id, e); }
+    | LOOKAHEAD(2) 
+     id = ID() <LBRACKET> e = Expression() <RBRACKET> <EQUAL> e2 = Expression() <SCOLON> { return new ArrayAssign(id, e, e2); }
 }
 
-void Empty():
-{}
+Exp Expression() :
 {
-    {}
+    Exp e1;
 }
-
-void Expression_prime():
-{}
 {
-    LOOKAHEAD(3)
-    <LOGIC_AND> LetT() Expression_prime()
-    | <SMALLER> LetT() Expression_prime()
-    | <PLUS> LetT() Expression_prime()
-    | <MINUS> LetT() Expression_prime()
-    | <MULT> LetT() Expression_prime()
-    | <LBRACKET> Expression() <RBRACKET> Expression_prime()
-    | LOOKAHEAD(2) <DOT> <LENGTH> Expression_prime()
-    | LOOKAHEAD(2) <DOT> <IDENTIFIER> <LPAR> ExpressionList() <RPAR> Expression_prime()
-    | Empty()
+    e1 = Expr1() (LOOKAHEAD(2) e1 = Expr2(e1))* // ((((a+b)+c)+d)+e)
+    { return e1; }
 }
 
-void LetTL():
-{}
+Exp Expr1() :
 {
-    <MULT> LetF() LetTL()
-    | <LOGIC_AND> LetF() LetTL()
-    | Empty()
-
+    Exp e, e2;
+    Token t;
+    Identifier id;
 }
-
-void LetT():
-{}
 {
-    LetF() LetTL()
+    <THIS> { e = new This(); return e; }
+    | <TRUE> { e = new True(); return e; }
+    | <FALSE> { e = new False(); return e; }
+    | t = <INTEGER_LITERAL> { e = new IntegerLiteral(Integer.parseInt(t.image)); return e; }
+    | id = ID() { e = new IdentifierExp(id.toString()); return e; }
+    | <LOGIC_NOT> e2 = Expression() { e = new Not(e2); return e; }
+    | <LPAR> e2 = Expression() <RPAR> { e = e2; return e; }
+    | LOOKAHEAD(2) 
+      <NEW> <INT> <LBRACKET> e2 = Expression() <RBRACKET> { e = new NewArray(e2); return e; }
+    | <NEW> id = ID() <LPAR> <RPAR> { e = new NewObject(id); return e; }
 }
 
-void Expression():
-{}
+Exp Expr2(Exp left_exp) :
 {
-    LetT() Expression_prime()
-    | LOOKAHEAD(2) <NEW> <INT> <LBRACKET> Expression() <RBRACKET> Expression_prime()
-    | LOOKAHEAD(2) <NEW> <IDENTIFIER> <LPAR> <RPAR> Expression_prime()
+    Exp right_exp; Exp final_exp;
+    Identifier id;
+    ExpList el = new ExpList();
 }
-
-void LetF():
-{}
 {
-    <INTEGER_LITERAL>
-    | <TRUE>
-    | <FALSE>
-    | <IDENTIFIER>
-    | <THIS>
-    | <LOGIC_NOT> Expression()
-    | <LPAR> Expression() <RPAR>
+    <LOGIC_AND> right_exp = Expression() { return new And(left_exp, right_exp); }
+    | <SMALLER> right_exp = Expression() { return new LessThan(left_exp, right_exp); }
+    | <PLUS> right_exp = Expression() { return new Plus(left_exp, right_exp); }
+    | <MINUS> right_exp = Expression() { return new Minus(left_exp, right_exp); }
+    | <MULT> right_exp = Expression() { return new Times(left_exp, right_exp); }
+    | <LBRACKET> right_exp = Expression() <RBRACKET> { return new ArrayLookup(left_exp, right_exp); }
+    | LOOKAHEAD(2) 
+      <DOT> <LENGTH> { return new ArrayLength(left_exp); }
+    | <DOT> id = ID() <LPAR> ( right_exp = Expression() { el.addElement(right_exp);}
+        ( <COMMA> right_exp = Expression() { el.addElement(right_exp);} )* )? <RPAR> { return new Call(left_exp, id, el); }
 }
 
-
-void ExpressionList():
-{}
-{
-    Expression() (ExpressionRest())*
-    | Empty()
-}
-
-void ExpressionRest():
-{}
-{
-    <COMMA> Expression()
-}
-
-
-
-Exp Start():
-    {Exp e;}
-    {e=Exp() {return e;}}
-
-Exp Exp():
-    {Exp e1, e2;}
-    {
-        e1=Term()
-        (
-            "+" e2=Term() {e1=new PlusExp(e1,e2);} |
-            "-" e2=Term() {e1=new MinusExp(e1,e2);}
-        )*
-        {return e1;}
-    }
-
-Exp Term():
-    {Exp e1, e2;}
-    {
-        e1=Factor()
-        (
-            "*" e2=Factor() {e1=new TimesExp(e1,e2);} |
-            "/" e2=Factor() {e1=new DivideExp(e1,e2);}
-        )*
-        {return e1;}
-    }
-
-Exp Factor():
-    {Token t; Exp e;}
-    {
-        (
-            t=<IDENTIFIER>      {return new Identifier(t.image);}       |
-            t=<INTEGER_LITERAL> {return new IntegerLiteral(t.image);}   |
-            "(" e=Exp() ")"     {return e;}
-        )
-    }
-
-
-
-
-public interface Visitor {
-    public int visit(PlusExp n);
-    public int visit(MinusExp n);
-    public int visit(TimesExp n);
-    public int visit(DivideExp n);
-    public int visit(Identifier n);
-    public int visit(IntegerLiteral n);
-}
-
-public class Interpreter implements Visitor {
-    public int visit(PlusExp n) {
-        return n.e1.accept(this) + n.e2.accept(this);
-    }
-
-    public int visit(MinusExp n) {
-        return n.e1.accept(this) - n.e2.accept(this);
-    }
-
-    public int visit(TimesExp n) {
-        return n.e1.accept(this) * n.e2.accept(this);
-    }
-
-    public int visit(DivideExp n) {
-        return n.e1.accept(this) / n.e2.accept(this);
-    }
-
-    public int visit(Identifier n) {
-        return lookup(n.f0);
-    }
-
-    public int visit(IntegerLiteral n) {
-        return Integer.parseInt(n.f0);
-    }
-
-}
-
-
-public abstract class Exp {
-    public abstract int accept(Visitor v);
-}
-
-public class PlusExp extends Exp {
-    public Exp e1, e2;
-
-    public PlusExp(Exp a1, Exp a2) {
-         e1=a1;
-         e2=a2;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
-public class MinusExp extends Exp {
-    public Exp e1, e2;
-
-    public MinusExp(Exp a1, Exp a2) {
-         e1=a1;
-         e2=a2;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
-public class TimesExp extends Exp {
-    public Exp e1, e2;
-
-    public TimesExp(Exp a1, Exp a2) {
-         e1=a1;
-         e2=a2;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
-public class DivideExp extends Exp {
-    public Exp e1, e2;
-
-    public DivideExp(Exp a1, Exp a2) {
-         e1=a1;
-         e2=a2;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
-public class Identifier extends Exp {
-    public String f0;
-
-    public Identifier(String n0) {
-        f0=n0;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
-public class IntegerLiteral extends Exp {
-    public String f0;
-
-    public IntegerLiteral(String n0) {
-        f0=n0;
-    }
-
-    public int accept(Visitor v) {
-        return v.visit(this);
-    }
-}
-
+Identifier ID() : {Token t;}
+{ t = <IDENTIFIER> {return new Identifier(t.image);}}
