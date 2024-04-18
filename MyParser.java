@@ -12,6 +12,9 @@ public class MyParser implements MyParserConstants {
         PrettyPrintVisitor ppvisitor = new PrettyPrintVisitor();
         p.accept(ppvisitor);
 
+        SymbolTableVisitor symbol_table_visitor = new SymbolTableVisitor();
+        p.accept(symbol_table_visitor);
+
         System.out.println("Success");
     } catch(Exception e) {
         System.out.println(e);
@@ -539,11 +542,6 @@ public class MyParser implements MyParserConstants {
     finally { jj_save(7, xla); }
   }
 
-  static private boolean jj_3R_11() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
   static private boolean jj_3_5() {
     if (jj_3R_12()) return true;
     if (jj_scan_token(LBRACKET)) return true;
@@ -817,6 +815,11 @@ public class MyParser implements MyParserConstants {
 
   static private boolean jj_3R_29() {
     if (jj_3R_30()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11() {
+    if (jj_3R_15()) return true;
     return false;
   }
 

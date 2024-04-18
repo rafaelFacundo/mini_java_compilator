@@ -12,6 +12,9 @@ public class MyParser {
         
         PrettyPrintVisitor ppvisitor = new PrettyPrintVisitor();
         p.accept(ppvisitor);
+
+        SymbolTableVisitor symbol_table_visitor = new SymbolTableVisitor();
+        p.accept(symbol_table_visitor);
         
         System.out.println("Success");
     } catch(Exception e) {
