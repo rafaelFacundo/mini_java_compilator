@@ -16,4 +16,8 @@ public class IdentifierType extends Type {
     public String toString(){
         return s;
     }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
 }

@@ -10,4 +10,8 @@ public class IntegerType extends Type {
     public String toString(){
         return "int";
     }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
 }

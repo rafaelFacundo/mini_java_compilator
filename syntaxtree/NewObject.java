@@ -15,4 +15,8 @@ public class NewObject extends Exp {
     public String toString() {
         return i.toString();
     }
+
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
 }

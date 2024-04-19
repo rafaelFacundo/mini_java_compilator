@@ -12,4 +12,8 @@ public class Not extends Exp {
         v.visit(this);
     }
 
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
 }

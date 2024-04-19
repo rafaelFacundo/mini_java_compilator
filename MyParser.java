@@ -15,6 +15,9 @@ public class MyParser implements MyParserConstants {
         SymbolTableVisitor symbol_table_visitor = new SymbolTableVisitor();
         p.accept(symbol_table_visitor);
 
+        TypeVeryfier type_visitor = new TypeVeryfier(symbol_table_visitor);
+        p.accept(type_visitor);
+
         System.out.println("Success");
     } catch(Exception e) {
         System.out.println(e);
@@ -542,18 +545,6 @@ public class MyParser implements MyParserConstants {
     finally { jj_save(7, xla); }
   }
 
-  static private boolean jj_3_5() {
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(LBRACKET)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_4() {
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(EQUAL)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_28() {
     if (jj_scan_token(SYSTEM_OUT_PRINTLN)) return true;
     return false;
@@ -820,6 +811,18 @@ public class MyParser implements MyParserConstants {
 
   static private boolean jj_3R_11() {
     if (jj_3R_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_5() {
+    if (jj_3R_12()) return true;
+    if (jj_scan_token(LBRACKET)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_4() {
+    if (jj_3R_12()) return true;
+    if (jj_scan_token(EQUAL)) return true;
     return false;
   }
 

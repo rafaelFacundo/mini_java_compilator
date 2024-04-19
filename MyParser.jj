@@ -15,6 +15,9 @@ public class MyParser {
 
         SymbolTableVisitor symbol_table_visitor = new SymbolTableVisitor();
         p.accept(symbol_table_visitor);
+
+        TypeVeryfier type_visitor = new TypeVeryfier(symbol_table_visitor);
+        p.accept(type_visitor);
         
         System.out.println("Success");
     } catch(Exception e) {

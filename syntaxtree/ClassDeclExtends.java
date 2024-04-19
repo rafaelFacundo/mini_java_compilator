@@ -16,4 +16,8 @@ public class ClassDeclExtends extends ClassDecl {
         v.visit(this);
     }
 
+    public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
 }
