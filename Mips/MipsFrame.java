@@ -9,7 +9,7 @@ import Temp.Temp;
 import Temp.Label;
 import Frame.Frame;
 import Frame.Access;
-import Syntaxtree.*;
+import Tree.*;
 import java.util.Arrays;
 
 public class MipsFrame extends Frame {
@@ -162,7 +162,7 @@ public class MipsFrame extends Frame {
     public Temp RV() { return V0; }
 
     private static HashMap<String,Label> labels = new HashMap<String,Label>();
-    public Syntaxtree.Exp externalCall(String s, List<Syntaxtree.Exp> args) {
+    public Tree.Exp externalCall(String s, List<Tree.Exp> args) {
 	String func = s.intern();
 	Label l = labels.get(func);
 	if (l == null) {
@@ -170,7 +170,12 @@ public class MipsFrame extends Frame {
 	    labels.put(func, l);
 	}
 	args.add(0, new Tree.CONST(0));
-	return new Tree.CALL(new Tree.NAME(l), args);
+	Tree.ExpList expList = null;
+
+    for (int i = args.size()-1; i >= 0; --i) {
+        expList = new Tree.ExpList(args.get(i), expList);
+    }
+	return new Tree.CALL(new Tree.NAME(l), expList);
     }
 
     public String string(Label lab, String string) {
@@ -331,8 +336,8 @@ public class MipsFrame extends Frame {
 	return new Assem.OPER(a, d, s, null);
     }
 
-    public void procEntryExit2(List<Assem.Instr> body) {
-	body.add(OPER("#\treturn", null, returnSink));
+	public void procEntryExit2(List<Assem.Instr> body) {
+		body.add(OPER("#\treturn", null, returnSink));
     }
 
     public void procEntryExit3(List<Assem.Instr> body) {

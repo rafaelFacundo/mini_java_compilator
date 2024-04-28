@@ -1,6 +1,5 @@
 package Frame;
 import java.util.List;
-import Syntaxtree.*;
 
 public abstract class Frame implements Temp.TempMap {
     public Temp.Label name;
@@ -9,7 +8,7 @@ public abstract class Frame implements Temp.TempMap {
     public abstract Access allocLocal(boolean escape);
     public abstract Temp.Temp FP();
     public abstract int wordSize();
-    public abstract Syntaxtree.Exp externalCall(String func, List<Syntaxtree.Exp> args);
+    public abstract Tree.Exp externalCall(String func, List<Tree.Exp> args);
     public abstract Temp.Temp RV();
     public abstract String string(Temp.Label label, String value);
     public abstract Temp.Label badPtr();

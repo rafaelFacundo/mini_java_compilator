@@ -1,7 +1,6 @@
 package Frame;
-import syntaxtree.;
 
-public abstract class Access {
-  public abstract String toString();
-  public abstract Tre.Exp exp(Tree.Exp e);
+public abstract class Access {  
+  public abstract String toString(); 
+  public abstract Tree.Exp exp(Tree.Exp e);
 }

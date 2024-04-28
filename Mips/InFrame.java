@@ -1,4 +1,4 @@
-public package Mips;
+package Mips;
 
 public class InFrame extends Frame.Access {
     int offset;
@@ -12,10 +12,7 @@ public class InFrame extends Frame.Access {
     }
 
     public String toString() {
-        Integer offset = new Integer(this.offset);
+        Integer offset = Integer.valueOf(this.offset);
 	return offset.toString();
     }
-}
- InFrame {
-    
 }

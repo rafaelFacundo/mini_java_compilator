@@ -1,4 +1,4 @@
-public package Mips;
+package Mips;
 import Temp.Temp;
 
 public class InReg extends Frame.Access {
@@ -14,7 +14,4 @@ public class InReg extends Frame.Access {
     public String toString() {
         return temp.toString();
     }
-}
- InReg {
-    
 }
