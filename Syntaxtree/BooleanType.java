@@ -1,5 +1,7 @@
 package Syntaxtree;
 
+import IRtree.ExpEnc;
+import IRtree.IRVisitor;
 import Syntaxtree.visitor.*;
 
 public class BooleanType extends Type {
@@ -12,6 +14,10 @@ public class BooleanType extends Type {
     }
 
     public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    public ExpEnc accept(IRVisitor v) {
         return v.visit(this);
     }
 }

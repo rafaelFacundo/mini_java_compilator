@@ -1,11 +1,14 @@
 PARSER_BEGIN(MyParser)
 
-import syntaxtree.*;
-import syntaxtree.visitor.*;
+import Syntaxtree.*;
+import Syntaxtree.visitor.*;
 import java.io.IOException;
+import IRtree.*;
+import Temp.*;
+import utils.*;
 
 public class MyParser {
-    public static void main(String[] args) throws ParseException, TokenMgrError, IOException{
+    public static void main(String[] args) throws ParseException, TokenMgrError, IOException, Exception{
     try {
         java.io.FileInputStream file = new java.io.FileInputStream(new java.io.File(args[0]));
         Program p = new MyParser(file).Prog();
@@ -18,6 +21,12 @@ public class MyParser {
 
         TypeVeryfier type_visitor = new TypeVeryfier(symbol_table_visitor);
         p.accept(type_visitor);
+
+        Mips.MipsFrame frameTeste = new Mips.MipsFrame();
+        IRVisitor visitorIntermediario = new IRVisitor(type_visitor, frameTeste);
+        p.accept(visitorIntermediario);
+
+
         
         System.out.println("Success");
     } catch(Exception e) {

@@ -386,7 +386,7 @@ public class IRVisitor implements IRtree.Visitor {
         }
 
         if(n.e instanceof Call) {
-            var tipoRetorno = metodoCallStack.getTipo();
+            String tipoRetorno = metodoCallStack.getTipo();
 
             Iterator<Symbol> iterator = classList.keySet().iterator();
             while (iterator.hasNext()) {
