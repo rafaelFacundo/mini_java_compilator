@@ -42,4 +42,28 @@ public class Convert {
 
         return array;
     }
+
+    public static List<Tree.Exp> ExpListToList(Tree.ExpList expList){
+
+        ArrayList<Tree.Exp> list = new ArrayList<Tree.Exp>();
+
+        Tree.ExpList temp = expList;
+        while (temp != null) {
+            list.add(temp.head);
+            temp = temp.tail;
+        }
+
+        return list;
+    }
+    public static Tree.ExpList ListToExpList(List<Tree.Exp> list) {
+
+        Tree.ExpList expList = null;
+
+        for (int i = list.size()-1; i >= 0; --i) {
+            expList = new Tree.ExpList(list.get(i), expList);
+        }
+
+        return expList;
+    }
+
 }

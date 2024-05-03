@@ -1,31 +1,31 @@
-package IRTree;
+package IRtree;
 
 import Frame.Frame;
-import symbol.*;
+import Symbol.*;
 import Tree.*;
 
 import java.util.*;
 
 import Syntaxtree.*;
-import syntaxtree.visitor.DepthFirstVisitor;
-import syntaxtree.visitor.TypeDepthFirstVisitor;
+import Syntaxtree.visitor.SymbolTableVisitor;
+import Syntaxtree.visitor.TypeVeryfier;
 import Temp.*;
 import utils.Convert;
 
-public class IRVisitor implements IRTree.Visitor {
+public class IRVisitor implements IRtree.Visitor {
 
     Stack<Frame> frames;
     Frame frameAtual;
-    public ClassTable mainclass;
-    public Hashtable<Symbol, ClassTable> classList;
+    public SymbolTable mainclass;
+    public Hashtable<Symbol, SymbolTable> classList;
     MethodTable metodoAtual;
-    ClassTable classeAtual;
+    SymbolTable classeAtual;
     public ArrayList <Frag> fragmentos;
-    ClassTable classeCallStack;
+    SymbolTable classeCallStack;
     MethodTable metodoCallStack;
 
 
-    public IRVisitor(TypeDepthFirstVisitor v, Frame frameAtual) {
+    public IRVisitor(TypeVeryfier v, Frame frameAtual) {
         mainclass = v.mainClass;
         classList = v.classList;
 
@@ -35,7 +35,7 @@ public class IRVisitor implements IRTree.Visitor {
         fragmentos = new ArrayList<Frag>();
     }
 
-    public IRVisitor(DepthFirstVisitor v, Frame frameAtual) {
+    public IRVisitor(SymbolTableVisitor v, Frame frameAtual) {
         mainclass = v.mainClass;
         classList = v.classList;
 
@@ -270,11 +270,11 @@ public class IRVisitor implements IRTree.Visitor {
     }
 
     @Override
-    public ExpEnc visit(syntaxtree.Print n) {
+    public ExpEnc visit(Syntaxtree.Print n) {
         ExpEnc exp = n.e.accept(this);
         Tree.ExpList parametros= new Tree.ExpList(exp.getExp(),null);
 
-        return new ExpEnc( frameAtual.externalCall("print", Converter.ExpListToList(parametros)));
+        return new ExpEnc( frameAtual.externalCall("print", Convert.ExpListToList(parametros)));
     }
 
     @Override
@@ -351,7 +351,7 @@ public class IRVisitor implements IRTree.Visitor {
     // TODO: FAZER POR ULTIMO
     @Override
     public ExpEnc visit(Call n) {
-        ClassTable j = null;
+        SymbolTable j = null;
 
         Tree.ExpList lista = null;
         for (int i = n.el.size()-1; i >= 0 ; i--) {
@@ -390,7 +390,7 @@ public class IRVisitor implements IRTree.Visitor {
 
             Iterator<Symbol> iterator = classList.keySet().iterator();
             while (iterator.hasNext()) {
-                ClassTable iteratorClass = classList.get(iterator.next());
+                SymbolTable iteratorClass = classList.get(iterator.next());
                 if (iteratorClass.getNome().equals(tipoRetorno)) {
                     j = iteratorClass;
                     break;
@@ -449,7 +449,7 @@ public class IRVisitor implements IRTree.Visitor {
 
         Tree.ExpList parametros = new Tree.ExpList(aloc,null);
 
-        List<Tree.Exp> listaConvertida = Converter.ExpListToList(parametros);
+        List<Tree.Exp> listaConvertida = Convert.ExpListToList(parametros);
 
         Tree.Exp retorno = frameAtual.externalCall("initArray", listaConvertida);
 
@@ -458,11 +458,11 @@ public class IRVisitor implements IRTree.Visitor {
 
     @Override
     public ExpEnc visit(NewObject n) {
-        ClassTable j = classList.get(Symbol.symbol(n.i.toString()));
+        SymbolTable j = classList.get(Symbol.symbol(n.i.toString()));
         int tam = j.getAtributos().size();
 
         Tree.ExpList parametros = new Tree.ExpList(new BINOP(BINOP.MUL,new CONST(1+tam) , new CONST(frameAtual.wordSize())), null);
-        List<Tree.Exp> lista = Converter.ExpListToList(parametros);
+        List<Tree.Exp> lista = Convert.ExpListToList(parametros);
         return new ExpEnc(frameAtual.externalCall("malloc", lista));
     }
 

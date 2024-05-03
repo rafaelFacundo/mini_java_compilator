@@ -1,5 +1,6 @@
 package Syntaxtree;
 
+import IRtree.IRVisitor;
 import Syntaxtree.visitor.*;
 
 public class Identifier {
@@ -21,6 +22,8 @@ public class Identifier {
         return s;
     }
 
-    
+    public IRtree.ExpEnc accept(IRVisitor irVisitor) {
+        return irVisitor.visit(this);
+    }
 
 }

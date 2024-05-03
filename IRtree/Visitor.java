@@ -1,6 +1,8 @@
 package IRtree;
 
-public class Visitor {
+import Syntaxtree.*; ;
+
+public interface Visitor {
     public ExpEnc visit(Program n);
     public ExpEnc visit(MainClass n);
     public ExpEnc visit(ClassDeclSimple n);

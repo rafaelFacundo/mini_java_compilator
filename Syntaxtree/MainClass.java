@@ -1,4 +1,5 @@
 package Syntaxtree;
+import IRtree.IRVisitor;
 import Syntaxtree.visitor.*;
 
 public class MainClass {
@@ -15,6 +16,10 @@ public class MainClass {
 
     public Type accept(TypeVisitor v) {
         return v.visit(this);
+    }
+
+    public IRtree.ExpEnc accept(IRVisitor irVisitor) {
+        return irVisitor.visit(this);
     }
 
 }

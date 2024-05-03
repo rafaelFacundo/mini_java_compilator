@@ -1,6 +1,9 @@
 package Symbol;
 
+import Frame.Access;
+
 public class Field extends Table {
+    public Access access;
     private String nome;
     private Symbol snome;
     private String tipo;

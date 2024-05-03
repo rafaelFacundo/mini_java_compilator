@@ -1,4 +1,5 @@
 package Syntaxtree;
+import IRtree.IRVisitor;
 import Syntaxtree.visitor.*;
 
 public class MethodDecl {
@@ -20,6 +21,10 @@ public class MethodDecl {
 
     public Type accept(TypeVisitor v) {
         return v.visit(this);
+    }
+
+     public IRtree.ExpEnc accept(IRVisitor irVisitor) {
+        return irVisitor.visit(this);
     }
 
 }
