@@ -1,8 +1,8 @@
 package Tree;
 
 public class BINOP extends Exp {
-    Exp e1, e2;
-    int operador;
+    public Exp e1, e2;
+    public int operador;
     public final static int PLUS = 1, MINUS = 2, MUL = 3, DIV = 4, AND = 5, OR = 6, XOR = 7, LSHIFT = 8, RSHIFT = 9, ARSHIFT = 10;
 
     public BINOP(int operador, Exp e1, Exp e2) {

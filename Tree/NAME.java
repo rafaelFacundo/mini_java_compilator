@@ -3,7 +3,7 @@ package Tree;
 import Temp.Label;
 
 public class NAME extends Exp{
-    Label cnst;
+    public Label cnst;
 
     public NAME(Label c){
         cnst = c;

@@ -1,8 +1,8 @@
 package Tree;
 
 public class ExpList {
-    Exp head;
-    ExpList tail;
+    public Exp head;
+    public ExpList tail;
 
     public ExpList(Exp h,ExpList t){
         head = h;

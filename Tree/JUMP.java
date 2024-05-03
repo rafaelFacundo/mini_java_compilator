@@ -4,8 +4,8 @@ import Temp.Label;
 import Temp.LabelList;
 
 public class JUMP extends Stm {
-    Exp e;
-    LabelList labels;
+    public Exp e;
+    public LabelList labels;
 
     public JUMP(Exp e, LabelList labels) {
         this.e = e;

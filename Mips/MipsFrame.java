@@ -10,6 +10,8 @@ import Temp.Label;
 import Frame.Frame;
 import Frame.Access;
 import Tree.*;
+import utils.Convert;
+
 import java.util.Arrays;
 
 public class MipsFrame extends Frame {
@@ -333,7 +335,7 @@ public class MipsFrame extends Frame {
     }
 
     private static Assem.Instr OPER(String a, Temp[] d, Temp[] s) {
-	return new Assem.OPER(a, d, s, null);
+	return new Assem.OPER(a, Convert.ArrayToTempList(d), Convert.ArrayToTempList(s), null);
     }
 
 	public void procEntryExit2(List<Assem.Instr> body) {
@@ -382,30 +384,30 @@ public class MipsFrame extends Frame {
 		for (ListIterator<Assem.Instr> i = insns.listIterator();
 		     i.hasNext(); ) {
 		    Assem.Instr insn = i.next();
-		    Temp[] use = insn.use;
+		    Temp[] use = Convert.TempListToArray(insn.use());
 		    if (use != null)
 			for (int u = 0; u < use.length; u++) {
 			    if (use[u] == spills[s]) {
 				Temp t = new Temp();
-				t.spillTemp = true;
+				//t.spillTemp = true;
 				Tree.Stm stm = MOVE(TEMP(t), exp);
 				i.previous();
-				stm.accept(new Codegen(this, i));
+				//stm.accept(new Codegen(this, i));
 				if (insn != i.next())
 				    throw new Error();
-				insn.replaceUse(spills[s], t);
+				//insn.replaceUse(spills[s], t);
 				break;
 			    }
 			}
-		    Temp[] def = insn.def;
+		    Temp[] def = Convert.TempListToArray(insn.def());
 		    if (def != null)
 			for (int d = 0; d < def.length; d++) {
 			    if (def[d] == spills[s]) {
 				Temp t = new Temp();
-				t.spillTemp = true;
-				insn.replaceDef(spills[s], t);
+				//t.spillTemp = true;
+				//insn.replaceDef(spills[s], t);
 				Tree.Stm stm = MOVE(exp, TEMP(t));
-				stm.accept(new Codegen(this, i));
+				//stm.accept(new Codegen(this, i));
 				break;
 			    }
 			}

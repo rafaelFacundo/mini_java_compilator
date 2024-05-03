@@ -1,7 +1,7 @@
 package Tree;
 
 public class CONST extends Exp{
-    Integer cnst;
+    public Integer cnst;
 
     public CONST(Integer c){
         cnst = c;

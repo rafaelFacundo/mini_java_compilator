@@ -3,9 +3,9 @@ package Tree;
 import Temp.Label;
 
 public class CJUMP extends Stm {
-    Exp e1, e2;
-    int operador;
-    Label t, f;
+    public Exp e1, e2;
+    public int operador;
+    public Label t, f;
 
     public final static int EQ = 1, NE = 2, LT = 3, GT = 4, LE = 5, GE = 6, ULT = 7, ULE = 8, UGT = 9, UGL = 10;
 

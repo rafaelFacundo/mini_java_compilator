@@ -1,7 +1,7 @@
 package Tree;
 
 public class MOVE extends Stm{
-    Exp dst, src;
+    public Exp dst, src;
 
     public MOVE(Exp d, Exp s) {
         dst=d;

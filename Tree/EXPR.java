@@ -1,9 +1,9 @@
 package Tree;
 
-public class EXP extends Stm {
-    Exp exp;
+public class EXPR extends Stm {
+    public Exp exp;
 
-    public EXP(Exp e) {
+    public EXPR(Exp e) {
         this.exp = e;
     }
 
@@ -11,6 +11,6 @@ public class EXP extends Stm {
         return new ExpList(exp, null);
     };
     public Stm build(ExpList kids) {
-        return new EXP(kids.head);
+        return new EXPR(kids.head);
     };
 }
