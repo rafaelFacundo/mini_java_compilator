@@ -1,8 +1,8 @@
 package Tree;
 
 public class ESEQ extends Exp {
-    Stm stm;
-    Exp e;
+    public Stm stm;
+    public Exp e;
 
     public ESEQ(Stm stm, Exp e) {
         this.stm = stm;

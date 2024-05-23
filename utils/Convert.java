@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Temp.TempList;
+import Tree.Stm;
+import Tree.StmList;
 
 public class Convert {
     public static Temp.TempList ArrayToTempList(Temp.Temp array[]) {
@@ -64,6 +66,18 @@ public class Convert {
         }
 
         return expList;
+    }
+
+    public static List<Stm> StmListToArray (StmList ht) {
+        ArrayList<Stm> r = new ArrayList<Stm>();
+
+        StmList h = ht;
+        while (h != null) {
+            r.add(h.head);
+            h = h.tail;
+        }
+
+        return r;
     }
 
 }

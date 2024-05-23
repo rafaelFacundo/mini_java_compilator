@@ -1,11 +1,15 @@
 PARSER_BEGIN(MyParser)
 
+import Canon.*;
 import Syntaxtree.*;
 import Syntaxtree.visitor.*;
 import java.io.IOException;
 import IRtree.*;
 import Temp.*;
 import utils.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyParser {
     public static void main(String[] args) throws ParseException, TokenMgrError, IOException, Exception{
@@ -25,7 +29,35 @@ public class MyParser {
         Mips.MipsFrame frameTeste = new Mips.MipsFrame();
         IRVisitor visitorIntermediario = new IRVisitor(type_visitor, frameTeste);
         p.accept(visitorIntermediario);
+        
+        ArrayList<Frag> frags = visitorIntermediario.fragmentos;
+            for (int i = 0; i < frags.size(); ++i) {
+                Frag atual = frags.get(i);
 
+                Tree.Print h = new Tree.Print(System.out, new CombineMap(atual.frame, new DefaultMap()));
+
+                System.out.println("\n\nFUNCAO: " + atual.nome);
+
+                System.out.println("\nSem canonizar:\n");
+                h.prStm(atual.body);
+
+                System.out.println("\nCanonizado:\n");
+                Tree.StmList statements = Canon.linearize(atual.body);
+                for (Tree.StmList c = statements; c != null; c = c.tail) {
+                    h.prStm(c.head);
+                }
+
+                // TODO: printar os dois abaixo
+                BasicBlocks b = new BasicBlocks(statements);
+                Tree.StmList t = (new TraceSchedule(b)).stms;
+
+                List<Assem.Instr> instrucoes = ((Mips.MipsFrame) atual.frame).codegen(Convert.StmListToArray(t));
+
+                System.out.println("\nInstrucoes:\n");
+                for (int j = 0; j < instrucoes.size(); ++j) {
+                    System.out.println(instrucoes.get(j).format(h.tmap));
+                }
+            }
 
         
         System.out.println("Success");

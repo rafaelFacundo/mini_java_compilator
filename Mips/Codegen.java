@@ -11,20 +11,20 @@ import java.util.List;
 public class Codegen {
 
     Frame frame;
-    private Assem.InstrList ilist = null, last = null;
-
+    public Assem.InstrList ilist = null, last = null;
+    
     public Codegen(Frame f) {
         frame = f;
     }
 
-    private void emit(Assem.Instr inst) {
+    public void emit(Assem.Instr inst) {
         if (last != null)
             last = last.tail = new Assem.InstrList(inst, null);
         else
             last = ilist = new Assem.InstrList(inst, null);
     }
 
-    void munchStm(Stm s) {
+    public void munchStm(Stm s) {
         if (s instanceof SEQ) {
             munchStm(((SEQ) s).s1);
             munchStm(((SEQ) s).s2);

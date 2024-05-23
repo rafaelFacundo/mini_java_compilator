@@ -260,9 +260,14 @@ public class MipsFrame extends Frame {
 
     public List<Assem.Instr> codegen(List<Tree.Stm> stms) {
 	List<Assem.Instr> insns = new java.util.LinkedList<Assem.Instr>();
-	/* Codegen cg = new Codegen(this, insns.listIterator());
+
+	Codegen cg = new Codegen(this);
+	for (int i = 0; i < insns.size(); i++) {
+		cg.emit(insns.get(i));
+	}
+
 	for (java.util.Iterator<Tree.Stm> s = stms.iterator(); s.hasNext(); )
-	    s.next().accept(cg);  */
+	    s.next().accept(cg);  
 	return insns;
 
     }
