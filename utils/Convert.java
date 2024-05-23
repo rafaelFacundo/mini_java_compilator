@@ -3,6 +3,8 @@ package utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import Assem.Instr;
+import Assem.InstrList;
 import Temp.TempList;
 import Tree.Stm;
 import Tree.StmList;
@@ -30,6 +32,18 @@ public class Convert {
         }
 
         return list;
+    }
+
+    public static List<Instr> InstrListToArray(InstrList ht) {
+        ArrayList<Instr> r = new ArrayList<Instr>();
+
+        InstrList h = ht;
+        while (h != null) {
+            r.add(h.head);
+            h = h.tail;
+        }
+
+        return r;
     }
 
     public static Temp.Temp[] TempListToArray(TempList tempList) {

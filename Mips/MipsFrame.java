@@ -258,19 +258,27 @@ public class MipsFrame extends Frame {
 
     int maxArgOffset = 0;
 
-    public List<Assem.Instr> codegen(List<Tree.Stm> stms) {
+    /* public List<Assem.Instr> codegen(List<Tree.Stm> stms) {
 	List<Assem.Instr> insns = new java.util.LinkedList<Assem.Instr>();
 
 	Codegen cg = new Codegen(this);
-	for (int i = 0; i < insns.size(); i++) {
-		cg.emit(insns.get(i));
-	}
+	cg.ilist = insns;
+	
 
 	for (java.util.Iterator<Tree.Stm> s = stms.iterator(); s.hasNext(); )
 	    s.next().accept(cg);  
 	return insns;
 
-    }
+    } */
+
+	public  List<Assem.Instr> codegen(List<Tree.Stm> stms) {
+		Codegen c = new Codegen(this);
+
+		// TODO: Fazer mais um conversor
+		// return c.codegen(stms);
+
+		return  Convert.InstrListToArray(c.codegen(stms));
+	}
 
     private static <R> void addAll(java.util.Collection<R> c, R[] a) {
 	for (int i = 0; i < a.length; i++)
