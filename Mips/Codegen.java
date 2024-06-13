@@ -42,7 +42,7 @@ public class Codegen {
             {
                 Temp r = munchExp(((CALL) (((EXPR) s).exp)).func);
                 TempList l = munchArgs(0, ((CALL) (((EXPR) s).exp)).args);
-                emit(new Assem.OPER("CALL " + ((NAME)((CALL) (((EXPR) s).exp)).func).cnst + "\n",
+                emit(new Assem.OPER("jal " + ((NAME)((CALL) (((EXPR) s).exp)).func).cnst + "\n",
                         null, new TempList(r, l)));
             }
         }
@@ -53,7 +53,7 @@ public class Codegen {
             return munchMem((MEM) s);
         if (s instanceof CONST) {
             Temp r = new Temp();
-            emit(new Assem.OPER("ADDI "+r +" <- r0+" + ((CONST) s).cnst
+            emit(new Assem.OPER("addi "+r +",  r0, " + ((CONST) s).cnst
                     + "\n", new TempList(r, null), null));
             return r;
         }
@@ -80,34 +80,34 @@ public class Codegen {
     private void munchCJump(CJUMP s) {
         Temp r = munchExp(new BINOP(BINOP.MINUS, s.e1, s.e2));
         if (s.operador == CJUMP.EQ) {
-            emit(new Assem.OPER("BRANCHEQ if " + r + " = 0 goto " + s.t+"\n",
+            emit(new Assem.OPER("beq " + r + ", 0, " + s.t+"\n",
                     null, new TempList(r, null), new LabelList(
                     s.t, null)));
         } else if (s.operador == CJUMP.GE) {
-            emit(new Assem.OPER("BRANCHGE if " + r + " >= 0 goto " + s.t+"\n",
+            emit(new Assem.OPER("bge " + r + ", 0, " + s.t+"\n",
                     null, new TempList(r, null), new LabelList(
                     s.t, null)));
         } else if (s.operador == CJUMP.LT) {
-            emit(new Assem.OPER("BRANCHLT if " + r + " < 0 goto " + s.t+"\n",
+            emit(new Assem.OPER("blt " + r + ", 0, " + s.t+"\n",
                     null, new TempList(r, null), new LabelList(
                     s.t, null)));
         } else if (s.operador == CJUMP.NE) {
-            emit(new Assem.OPER("BRANCHNE if " + r + " != 0 goto " + s.t+"\n",
+            emit(new Assem.OPER("bne " + r + ", 0, " + s.t+"\n",
                     null, new TempList(r, null), new LabelList(
                     s.t, null)));
         }
         else if (s.operador == CJUMP.GT) {
-            emit(new Assem.OPER("BRANCHGT if " + r + " > 0 goto " + s.t+"\n",
+            emit(new Assem.OPER("bgt " + r + ", 0, " + s.t+"\n",
                     null, new TempList(r, null), new LabelList(
                     s.t,null)));
         }
         else
-            emit(new Assem.OPER("goto " + s.f.toString()+"\n", null, null,
+            emit(new Assem.OPER("j " + s.f.toString()+"\n", null, null,
                     new LabelList(s.f, null)));
     }
 
     private void munchJump(JUMP s) {
-        emit(new Assem.OPER("goto " + ((NAME) s.e).cnst.toString() + "\n",
+        emit(new Assem.OPER("jr " + ((NAME) s.e).cnst.toString() + "\n",
                 null, null, new LabelList(((NAME) s.e).cnst, null)));
     }
 
@@ -119,54 +119,51 @@ public class Codegen {
 
             TempList fonte = new TempList(munchExp(src), null);
 
-            emit(new Assem.OPER("STORE M[" + frame.FP() + " + " + destino.head
-                    + " + " + ((CONST) ((BINOP) dst.exp).e2).cnst
-                    + " ] <- " + fonte.head+"\n", destino, fonte));
+            emit(new Assem.OPER("sw" + fonte.head  + ", " + ((CONST) ((BINOP) dst.exp).e2).cnst
+                    + "( add s0, " + frame.FP() + "," + destino.head + ")\n", destino, fonte));
+
+            
         }
         else if (dst.exp instanceof BINOP
                 && ((BINOP) dst.exp).operador == BINOP.PLUS
                 && ((BINOP) dst.exp).e1 instanceof CONST) {
-
+            Temp r = new Temp();
             TempList destino = new TempList(
                     munchExp(((BINOP) dst.exp).e2), null);
 
             TempList fonte = new TempList(munchExp(src), null);
 
-            emit(new Assem.OPER("STORE M[" + frame.FP() + " + " + destino.head
-                    + " + " + ((CONST) ((BINOP) dst.exp).e1).cnst + "] <- "
-                    + fonte.head +"\n", destino, fonte));
-        }
-
-        else if (src instanceof MEM) {
-            TempList destino = new TempList(munchExp(dst.exp), null);
-            TempList fonte = new TempList(munchExp(src), null);
-
-            emit(new Assem.OPER("MOVEM M[" + frame.FP() + " + " + destino.head
-                    + "] <- M[" + fonte.head + "]"+"\n", destino, fonte));
+            emit(new Assem.OPER("add " + r + ", " + frame.FP() + ", " + destino.head + "\n", new TempList(r, null), destino));
+            emit(new Assem.OPER("sw " + fonte.head + ", " + ((CONST) ((MEM) dst.exp).exp).cnst + " (" + r +")\n", destino, fonte));
         }
 
         else if (dst.exp instanceof MEM && ((MEM) dst.exp).exp instanceof CONST) {
-
+            Temp r = new Temp();
             TempList destino = new TempList(munchExp(dst.exp), null);
             TempList fonte = new TempList(munchExp(src), null);
 
-            emit(new Assem.OPER("STORE M[" + frame.FP() + " + "
+           /*  emit(new Assem.OPER("2 M[" + frame.FP() + " + "
                     + ((CONST) ((MEM) dst.exp).exp).cnst + "] <- "
-                    + fonte.head+"\n", destino, fonte, null));
+                    + fonte.head+"\n", destino, fonte, null)); */
+            
+            emit(new Assem.OPER("add " + r + ", " + frame.FP() + ", " + destino.head + "\n", new TempList(r, null), destino));
+            emit(new Assem.OPER("sw " + fonte.head + ", " + ((CONST) ((MEM) dst.exp).exp).cnst + " (" + r +")\n", destino, fonte));
         }
 
         else {
+            Temp r = new Temp();
             TempList destino = new TempList(munchExp(dst.exp), null);
             TempList fonte = new TempList(munchExp(src), null);
-            emit(new Assem.OPER("STORE M[" + frame.FP() + " + " + destino.head
-                    + " + 0] <- " + fonte.head+"\n", destino, fonte));
+
+            emit(new Assem.OPER("add " + r + ", " + frame.FP() + ", " + destino.head + "\n", new TempList(r, null), destino));
+            emit(new Assem.OPER("sw " + fonte.head + ", 0 (" + r +")\n", destino, fonte));
         }
 
     }
 
     void munchMove(TEMP dst, Exp src) {
         Temp t = munchExp(src);
-        emit(new Assem.MOVE("MOVEA " + dst.temp+ " <- " + t+"\n", dst.temp, t));
+        emit(new Assem.MOVE("move " + dst.temp+ ", " + t+"\n", dst.temp, t));
     }
 
     void munchMove(Exp dst, Exp src) {
@@ -177,7 +174,7 @@ public class Codegen {
         if (dst instanceof TEMP && src instanceof CALL) {
             Temp r = munchExp(((CALL) src).func);
             TempList l = munchArgs(0, ((CALL) src).args);
-            emit(new Assem.OPER("CALL " + ((NAME)((CALL) src).func).cnst + "\n",
+            emit(new Assem.OPER("jal " + ((NAME)((CALL) src).func).cnst + "\n",
                     new TempList(r,null), l));
         } else if (dst instanceof TEMP)
             munchMove((TEMP) dst, src);
@@ -188,7 +185,7 @@ public class Codegen {
         if (s.operador == BINOP.PLUS && s.e2 instanceof CONST) {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1), null);
-            emit(new Assem.OPER("ADDI "+ r + " <- " + fonte.head + " + "
+            emit(new Assem.OPER("addi "+ r + ", " + fonte.head + ", "
                     + ((CONST) s.e2).cnst + "\n",
                     new TempList(r, null), fonte));
             return r;
@@ -199,7 +196,7 @@ public class Codegen {
         if (s.operador == BINOP.PLUS && s.e1 instanceof CONST) {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e2), null);
-            emit(new Assem.OPER("ADDI "+ r + " <- "  + fonte.head + " + "
+            emit(new Assem.OPER("addi "+ r + ", "  + fonte.head + ", "
                     + ((CONST) s.e1).cnst + "\n",
                     new TempList(r, null), fonte));
             return r;
@@ -211,7 +208,7 @@ public class Codegen {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1),
                     new TempList(munchExp(s.e2), null));
-            emit(new Assem.OPER("ADD "+ r + " <- " + fonte.head + "+"
+            emit(new Assem.OPER("add "+ r + ", " + fonte.head + ", "
                     + fonte.tail.head + "\n", new TempList(r, null), fonte));
             return r;
         }
@@ -221,7 +218,7 @@ public class Codegen {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1),
                     new TempList(munchExp(s.e2), null));
-            emit(new Assem.OPER("MUL "+ r + " <- " + fonte.head + "*"
+            emit(new Assem.OPER("mult "+ r + ", " + fonte.head + ", "
                     + fonte.tail.head + "\n", new TempList(r, null), fonte));
             return r;
         }
@@ -231,7 +228,7 @@ public class Codegen {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1),
                     new TempList(munchExp(s.e2), null));
-            emit(new Assem.OPER("DIV "+ r + " <- " + fonte.head + "/"
+            emit(new Assem.OPER("div "+ r + ", " + fonte.head + ", "
                     + fonte.tail.head + "\n", new TempList(r, null), fonte));
             return r;
         }
@@ -240,7 +237,7 @@ public class Codegen {
         if (s.operador == BINOP.MINUS && s.e2 instanceof CONST) {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1),null);
-            emit(new Assem.OPER("SUBI "+ r + " <- " + fonte.head + " - "
+            emit(new Assem.OPER("subi "+ r + ", " + fonte.head + ", "
                     + ((CONST) s.e2).cnst + "\n",
                     new TempList(r, null), fonte));
             return r;
@@ -252,7 +249,7 @@ public class Codegen {
             Temp r = new Temp();
             TempList fonte = new TempList(munchExp(s.e1),
                     new TempList(munchExp(s.e2), null));
-            emit(new Assem.OPER("SUB "+r +" <- " + fonte.head + "-"
+            emit(new Assem.OPER("sub "+r +", " + fonte.head + ", "
                     + fonte.tail.head + "\n", new TempList(r, null), fonte));
             return r;
         }
@@ -268,9 +265,9 @@ public class Codegen {
                 && ((BINOP) s.exp).e2 instanceof CONST) {
             Temp r = new Temp();
             emit(new Assem.OPER(
-                    "LOAD "+ r +" <- M[‘s0+"
+                    "lw "+ r +", "
                             + ((CONST) (((BINOP) s.exp).e2)).cnst
-                            + "]\n",
+                            + "(s0)\n",
                     new TempList(r, null),
                     new TempList(munchExp(((BINOP) s.exp).e1), null)));
             return r;
@@ -282,8 +279,8 @@ public class Codegen {
                 && (((BINOP) s.exp).operador == BINOP.PLUS)
                 && ((BINOP) s.exp).e1 instanceof CONST) {
             Temp r = new Temp();
-            emit(new Assem.OPER("LOAD "+r + " <- M[‘s0+"
-                    + ((CONST) (((BINOP) s.exp).e1)).cnst + "]\n",
+            emit(new Assem.OPER("lw "+r + ", "
+                    + ((CONST) (((BINOP) s.exp).e1)).cnst + "(s0)\n",
                     new TempList(r, null), new TempList(
                     munchExp(((BINOP) s.exp).e2), null)));
             return r;
@@ -293,14 +290,14 @@ public class Codegen {
         // munchExp(MEM(CONST (i)))
         if (s.exp instanceof CONST) {
             Temp r = new Temp();
-            emit(new Assem.OPER("LOAD "+r+ "<- M[r0+" + ((CONST) s.exp).cnst
-                    + "]\n", new TempList(r, null), null));
+            emit(new Assem.OPER("lw "+r+ ", " + ((CONST) s.exp).cnst
+                    + "(r0)\n", new TempList(r, null), null));
             return r;
         }
 
         // munchExp(MEM(e1))
         Temp r = new Temp();
-        emit(new Assem.OPER("LOAD "+ r +" <- M[‘s0+0]\n",
+        emit(new Assem.OPER("lw "+ r +",0(s0)\n",
                 new TempList(r, null), new TempList(munchExp(s.exp),
                 null)));
         return r;
