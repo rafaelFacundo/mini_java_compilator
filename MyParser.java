@@ -6,6 +6,7 @@ import java.io.IOException;
 import IRtree.*;
 import Temp.*;
 import utils.*;
+import Graph.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,10 @@ public class MyParser implements MyParserConstants {
                 for (int j = 0; j < instrucoes.size(); ++j) {
                     System.out.println(instrucoes.get(j).format(h.tmap));
                 }
+
+                System.out.println("\u005cnFLUXO:\u005cn");
+                AssemFlowGraph fluxo = new AssemFlowGraph(instrucoes);
+                fluxo.show(System.out);
             }
 
 
@@ -586,17 +591,6 @@ public class MyParser implements MyParserConstants {
     finally { jj_save(7, xla); }
   }
 
-  static private boolean jj_3R_12() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_22() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_10() {
     if (jj_3R_14()) return true;
     if (jj_3R_12()) return true;
@@ -864,6 +858,17 @@ public class MyParser implements MyParserConstants {
 
   static private boolean jj_3_1() {
     if (jj_3R_10()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_12() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_22() {
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
