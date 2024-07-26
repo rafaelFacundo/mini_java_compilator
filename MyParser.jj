@@ -7,6 +7,7 @@ import java.io.IOException;
 import IRtree.*;
 import Temp.*;
 import utils.*;
+import Graph.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,10 @@ public class MyParser {
                 for (int j = 0; j < instrucoes.size(); ++j) {
                     System.out.println(instrucoes.get(j).format(h.tmap));
                 }
+
+                System.out.println("\nFLUXO:\n");
+                AssemFlowGraph fluxo = new AssemFlowGraph(instrucoes);
+                fluxo.show(System.out);
             }
 
         
