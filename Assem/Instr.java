@@ -1,7 +1,11 @@
 package Assem;
 
+import Temp.LabelList;
+
 public abstract class Instr {
   public String assem;
+  public LabelList jumps;
+
   public abstract Temp.TempList use();
   public abstract Temp.TempList def();
   public abstract Targets jumps();
@@ -19,7 +23,7 @@ public abstract class Instr {
   public String format(Temp.TempMap m) {
     Temp.TempList dst = def();
     Temp.TempList src = use();
-    Targets j = jumps();
+    Targets j =  jumps();
     Temp.LabelList jump = (j==null)?null:j.labels;
     StringBuffer s = new StringBuffer();
     int len = assem.length();

@@ -31,47 +31,67 @@ public class AssemFlowGraph extends FlowGraph
         // construindo os nos
         Instr aux_label = null, aux_branch = null;
         for( InstrList a = ilist ; a != null; a = (InstrList) a.tail ){
-        	if ( a.head instanceof Assem.LABEL ){
-            		aux_label = a.head;
+            if ( a.head instanceof Assem.LABEL ){
+                aux_label = a.head;
+               
         	}else{
-        		Node n = this.newNode();
+                Node n = this.newNode();
         		map.put(n, a.head);            
         		revMap.put(a.head, n);     
         		if(aux_label!=null){ 
-        			map1.put(((Assem.LABEL)aux_label).label, a.head );
+                    map1.put(((Assem.LABEL)aux_label).label, a.head );
+                    
         			revMap1.put( a.head, ((Assem.LABEL)aux_label).label);
         			aux_label = null;
         		}
             }
         }
         for ( InstrList aux = ilist; aux != null; aux = (InstrList) aux.tail ){
-        	if(!(aux.head instanceof Assem.LABEL)){
-        		LabelList jmps = aux.head.jumps; 
+            if(!(aux.head instanceof Assem.LABEL)){
+                
+                LabelList jmps = aux.head.jumps; 
         		
 	            if ( jmps == null ){
-	                if (aux.tail != null){
-	                	if(!(aux.tail.head instanceof Assem.LABEL)) this.addEdge(revMap.get(aux.head), revMap.get(aux.tail.head));
-	                	else  this.addEdge(revMap.get(aux.head), revMap.get(map1.get(((Assem.LABEL)aux.tail.head).label)));
+
+                    if (aux.tail != null){
+
+                        if(!(aux.tail.head instanceof Assem.LABEL)) {
+                            this.addEdge(revMap.get(aux.head), revMap.get(aux.tail.head));
+                        } else  {
+                            
+                            try {
+                                this.addEdge(revMap.get(aux.head), revMap.get(map1.get(((Assem.LABEL)aux.tail.head).label)));
+                            } catch (Exception e) {
+                                // TODO: handle exception
+                                System.out.println("NUll\n");
+                                
+                            }
+
+                        };
+                        
 	                } 
 	            }
 	            else{
-	            	//System.out.println("ENTROU");
+
+                    //System.out.println("ENTROU");
 	                for ( LabelList a = jmps; a != null; a = (LabelList) a.tail ){
-	                	
-	                	if(revMap1.contains(a.head)){
-	                		this.addEdge(revMap.get(aux.head), revMap.get(map1.get(a.head)));
+                        
+                        if(revMap1.contains(a.head)){
+                            this.addEdge(revMap.get(aux.head), revMap.get(map1.get(a.head)));
 	                		//System.out.println("add "+revMap.get(aux.head).toString()+"->"+revMap.get(map1.get(a.head)).toString());
 	                	}
 	                }
 	            }
+
+
 	            
 	            // para o caso de instru��o branch
 	            if(aux_branch!=null){
-	            	this.addEdge(revMap.get(aux_branch), revMap.get(aux.head));
+                    this.addEdge(revMap.get(aux_branch), revMap.get(aux.head));
 	            	aux_branch = null;
 	            }
 	            
-	            if(aux.head.branch) aux_branch = aux.head;
+	            //if(aux.head.branch) aux_branch = aux.head;
 	            
         	}
         }        

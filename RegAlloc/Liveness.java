@@ -24,6 +24,7 @@ public class Liveness {
 		}
 		this.g = g;
 		liveness();
+		
 	}
 
 	private void liveness() {
@@ -31,11 +32,17 @@ public class Liveness {
 		inAnt = new HashMap<Integer, TempList>();
 		outAnt = new HashMap<Integer, TempList>();
 		// recalcula In and Out de cada n� enquanto diferir do calculo anterior!
+		copyIn();
+		copyOut();
 		do{
-			copyIn();
-			copyOut();
+			
 			for(List<Node> nl = g.nodes(); nl != null ; nl = nl.tail){
+				//System.out.println(nl.head);
 				updateIn(nl.head);
+				
+			}
+			for(List<Node> nl = g.nodes(); nl != null ; nl = nl.tail){
+				//System.out.println(nl.head);
 				updateOut(nl.head);
 				
 			}
@@ -44,14 +51,20 @@ public class Liveness {
 	}
 
 	private void updateOut(Node v) {
+		
 		TempList list = null;
 		List<Node> suc = v.succ();
 		if(suc != null){
 			for(suc = v.succ(); suc != null ; suc = suc.tail){
 				TempList tl = in.get(suc.head.mykey);
+				
 				for( ; tl != null; tl = (TempList) tl.tail){
-					if(list == null) list = new TempList(tl.head, null);
-					if(!list.contains(tl.head))list = new TempList(tl.head, list);
+					if(list == null) {
+						list = new TempList(tl.head, null);
+					};
+					if(!list.contains(tl.head)) {
+						list = new TempList(tl.head, list);
+					}
 				}
 			}
 		}
