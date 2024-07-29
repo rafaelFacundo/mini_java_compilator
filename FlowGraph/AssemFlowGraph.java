@@ -1,149 +1,222 @@
 package FlowGraph;
 
-import java.util.Hashtable;
-
-import Assem.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import assem.Instr;
+import assem.LABEL;
+import assem.MOVE;
+import util.List;
 import Graph.Node;
-import Temp.*;
-import utils.List;
+import Graph.NodeList;
+import Temp.Label;
+import Temp.Temp;
 
-public class AssemFlowGraph extends FlowGraph
-{
-    private Hashtable<Node, Instr> map;
-    private Hashtable<Instr, Node> revMap;
-    Hashtable <Label, Instr> map1;
-    Hashtable <Instr, Label> revMap1;
-        
-    public AssemFlowGraph(InstrList list)
-    {
-        super();
-        
-        map = new Hashtable<Node, Instr>();
-        revMap = new Hashtable<Instr, Node>();
-        map1 = new Hashtable<Label, Instr>();
-        revMap1 = new Hashtable<Instr,Label>();
-        
-        buildGraph(list);
-    }
-        
-    private void buildGraph(InstrList ilist){ 
-    	//Instr i1 = new OPER("", null, null, null);
-        // construindo os nos
-        Instr aux_label = null, aux_branch = null;
-        for( InstrList a = ilist ; a != null; a = (InstrList) a.tail ){
-        	if ( a.head instanceof Assem.LABEL ){
-            		aux_label = a.head;
-        	}else{
-        		Node n = this.newNode();
-        		map.put(n, a.head);            
-        		revMap.put(a.head, n);     
-        		if(aux_label!=null){ 
-        			map1.put(((Assem.LABEL)aux_label).label, a.head );
-        			revMap1.put( a.head, ((Assem.LABEL)aux_label).label);
-        			aux_label = null;
-        		}
-            }
-        }
-        for ( InstrList aux = ilist; aux != null; aux = (InstrList) aux.tail ){
-        	if(!(aux.head instanceof Assem.LABEL)){
-        		LabelList jmps = aux.head.jumps; 
-        		
-	            if ( jmps == null ){
-	                if (aux.tail != null){
-	                	if(!(aux.tail.head instanceof Assem.LABEL)) this.addEdge(revMap.get(aux.head), revMap.get(aux.tail.head));
-	                	else  this.addEdge(revMap.get(aux.head), revMap.get(map1.get(((Assem.LABEL)aux.tail.head).label)));
-	                } 
-	            }
-	            else{
-	            	//System.out.println("ENTROU");
-	                for ( LabelList a = jmps; a != null; a = (LabelList) a.tail ){
-	                	
-	                	if(revMap1.contains(a.head)){
-	                		this.addEdge(revMap.get(aux.head), revMap.get(map1.get(a.head)));
-	                		//System.out.println("add "+revMap.get(aux.head).toString()+"->"+revMap.get(map1.get(a.head)).toString());
-	                	}
-	                }
-	            }
-	            
-	            // para o caso de instru��o branch
-	            if(aux_branch!=null){
-	            	this.addEdge(revMap.get(aux_branch), revMap.get(aux.head));
-	            	aux_branch = null;
-	            }
-	            
-	            if(aux.head.branch) aux_branch = aux.head;
-	            
-        	}
-        }        
-    }
+public class AssemFlowGraph extends FlowGraph<Instr>{
 
-    
-    public Instr instr(Node node)
-    {
-        return map.get(node);
-    }
-    
-    public Node node(Instr instr)
-    {
-        return revMap.get(instr);
-    }
-
-    public TempList def(Node node)
-    {
-        Instr i = map.get(node);
-        
-        if ( i == null )
-            return null;
-        
-        return i.def();
-    }
-
-    public TempList use(Node node)
-    {
-        Instr i = map.get(node);
-        
-        if ( i == null )
-            return null;
-        
-        return i.use();
-    }
-
-    public boolean isMove(Node node)
-    {
-        Instr i = map.get(node);
-        
-        if ( i == null )
-            return false;
-        
-        return i instanceof MOVE;
-    }
-    
-    public void print()
-    {
-        for (List<Node> p=nodes(); p!=null; p=p.tail)
-        {
-            Node n = p.head;
-            System.out.print(n.toString());
-            if(map1.contains(map.get(n)))System.out.print("["+revMap1.get(map.get(n)).print()+"]");
-            System.out.print("["+ map.get(n).assem +"]: ");
-            for(List<Node> q=n.succ(); q!=null; q=q.tail)
-            {
-            	System.out.print(q.head.toString());
-            	System.out.print(" ");
-            }
-            
-            /*System.out.println();
-            System.out.print("USE:");
-			for(TempList aux = this.use(n); aux != null; aux = (TempList) aux.tail){
-				if(aux.head != null) System.out.print(aux.head.toString()+ " ");
-			}
+	public HashMap<Node<Instr>, ArrayList<Temp>> liveIn;
+	public HashMap<Node<Instr>, ArrayList<Temp>> liveOut;
+	public List<List<Instr>> instrs;
+	
+	public AssemFlowGraph(List<List<Instr>> blocks) {
+		super();
+		instrs = blocks;
+		liveIn = new HashMap<Node<Instr>, ArrayList<Temp>>();
+		liveOut = new HashMap<Node<Instr>, ArrayList<Temp>>();
+		
+		// para cada bloco basico
+		for (List<List<Instr>> lb = blocks; lb!=null; lb=lb.tail){
 			
+			// inicia com primeira instrucao do bloco basico
+			Node<Instr> from;
+			if((from=contains(lb.head.head))==null)from = newNode(lb.head.head);
+			Node<Instr> to;
+			
+			for (List<Instr> l = lb.head.tail; l!=null; l=l.tail) {
+				// insere no com instrucao no grafo, caso nao exista
+				if((to=contains(l.head))==null){
+					to = newNode(l.head);
+				}
+							
+				addEdge(from, to);
+								
+				// jumps ou cjumps
+				if(to.value.jumps!=null){
+					addEdgeJumps(to, to.value.jumps.head, blocks);
+				}
+				from = to;
+			}
+		}
+	}
+	
+	public void computeLiveness(){
+		ArrayList<Temp> inLine;
+		ArrayList<Temp> outLine;
+		HashMap<Node<Instr>, ArrayList<Temp>> liveInLine = new HashMap<Node<Instr>, ArrayList<Temp>>();
+		HashMap<Node<Instr>, ArrayList<Temp>> liveOutLine = new HashMap<Node<Instr>, ArrayList<Temp>>();
+		NodeList<Node<Instr>> nl;
+		
+		for(nl = mynodes; nl!=null; nl = nl.tail){
+			inLine = new ArrayList<Temp>();
+			outLine = new ArrayList<Temp>();
+			liveInLine.put(nl.head, inLine);
+			liveOutLine.put(nl.head, outLine);
+			liveIn.put(nl.head, inLine);
+			liveOut.put(nl.head, outLine);
+		}
+		
+		do{
+		
+			for(nl = mynodes; nl!=null; nl = nl.tail){
+				
+				//remove todos os elementos de in'
+				liveInLine.remove(nl.head);
+				//insere os elementos de in em in'
+				liveInLine.put(nl.head, liveIn.get(nl.head));				
+				
+				
+				//remove todos os elementos de out'
+				liveOutLine.remove(nl.head);
+				//insere os elementos de out em out'
+				liveOutLine.put(nl.head, liveOut.get(nl.head));
+				
+				
+				//remove os elementos de in
+				liveIn.remove(nl.head);
+				
+				//in[n] = use[n] U (out[n]-def[n])
+				buildLiveIn(nl.head);
+				
+				//remove os elementos de out
+				liveOut.remove(nl.head);
+				
+				//out[n]= Us in succ[n] in[s]
+				buildLiveOut(nl.head);
+		
+			}
+		}while(!compareInOut(liveInLine, liveOutLine));
+	}
+	
+	
+	private void buildLiveOut(Node<Instr> node) {
+		//succ[n]
+		liveOut.put(node, new ArrayList<Temp>());
+		for (NodeList<Node<Instr>> suc = node.succ(); suc!=null; suc = suc.tail) {
+			//para cada s de succ[n], out[n] = in[s]
+			for (int i = liveIn.get(suc.head).size()-1; i >=0; i--) {
+				liveOut.get(node).add(liveIn.get(suc.head).get(i));
+			}
+		}
+	}
+
+	//in[n] = use[n] U (out[n]-def[n])
+	private void buildLiveIn(Node<Instr> node) {
+		
+		liveIn.put(node, new ArrayList<Temp>());
+		for(List<Temp> listTemp = use(node); listTemp!=null; listTemp = listTemp.tail){
+			liveIn.get(node).add(listTemp.head);
+		}
+		for(int i= liveOut.get(node).size()-1;i>=0;i--){
+			Temp t = liveOut.get(node).get(i);
+			if(!isDef(t, node)&& !liveIn.get(node).contains(t)) liveIn.get(node).add(t);
+		}
+	}
+
+	//verifica se um temp de entrada que esta em out[node] pertence a def[node]
+	private boolean isDef(Temp temp, Node<Instr> node) {
+		for (List<Temp> def = def(node); def!=null; def = def.tail) {
+			if(def.head.equals(temp)) return true;
+		}
+		return false;
+	}
+
+	//verifica se in'[n]=in[n] e out'[n]=out[n] para todo n
+	private boolean compareInOut(HashMap<Node<Instr>, ArrayList<Temp>> liveInLine,
+			HashMap<Node<Instr>, ArrayList<Temp>> liveOutLine) {
+		
+		for(NodeList<Node<Instr>> nl = mynodes; nl!=null; nl = nl.tail){
+			for (int i = 0; i < liveIn.get(nl.head).size(); i++) {
+				if(!liveInLine.get(nl.head).contains(liveIn.get(nl.head).get(i))) return false;
+			}
+			for (int i = 0; i < liveOut.get(nl.head).size(); i++) {
+				if(!liveOutLine.get(nl.head).contains(liveOut.get(nl.head).get(i))) return false;
+			}
+			for (int i = 0; i < liveInLine.get(nl.head).size(); i++) {
+				if(!liveIn.get(nl.head).contains(liveInLine.get(nl.head).get(i))) return false;
+			}
+			for (int i = 0; i < liveOutLine.get(nl.head).size(); i++) {
+				if(!liveOut.get(nl.head).contains(liveOutLine.get(nl.head).get(i))) return false;
+			}
+		}
+		return true;
+	}
+
+	private void addEdgeJumps(Node<Instr> from, Label label, List<List<Instr>> blocks){
+		Node<Instr> n = null;
+		
+		// verifica se aresta ja existe
+		for(NodeList<Node<Instr>> nl = from.adj(); nl!=null; nl=nl.tail){
+			if(nl.head.value instanceof LABEL && 
+					((LABEL)nl.head.value).label.toString().equals(label.toString())){
+				return;
+			}
+		}
+		
+		// verifica se o no referente a label ja existe no grafo e a tribui a n caso exista
+		for(NodeList<Node<Instr>> nl = mynodes; nl!=null; nl=nl.tail){
+			if(nl.head.value instanceof LABEL && 
+					((LABEL)nl.head.value).label.toString().equals(label.toString())){
+				n = nl.head;
+			}
+		}
+		
+		// caso o no nao exista, cria o no
+		if(n==null){
+			for (List<List<Instr>> lb = blocks; lb!=null; lb=lb.tail){
+				for (List<Instr> lt = lb.head; lt!=null; lt=lt.tail) {
+					if(lt.head instanceof LABEL && 
+							((LABEL)lt.head).label.toString().equals(label.toString())){
+						System.out.println("achou");
+						n = newNode(lt.head);
+						addEdge(from, n);
+						return;
+					}
+				}
+			}
+		}
+		addEdge(from, n);	
+	}
+	
+	@Override
+	public List<Temp> def(Node<Instr> node) {
+		return node.value.def;
+	}
+
+	@Override
+	public boolean isMove(Node<Instr> node) {
+		return (node.value instanceof MOVE); 
+	}
+
+	@Override
+	public List<Temp> use(Node<Instr> node) {
+		return node.value.use;
+	}
+	
+	public void showIN_OUT(){
+		for(NodeList<Node<Instr>> nl = mynodes; nl!= null; nl = nl.tail){
+			System.out.println("No: "+nl.head.value.assem);
+			
+			System.out.println("LiveIn:");
+			for (Temp t : liveIn.get(nl.head)) {
+				System.out.print(t+" ");
+			}
 			System.out.println();
-            System.out.print("DEF:");
-			for(TempList aux = this.def(n); aux != null; aux = (TempList) aux.tail){
-				if(aux.head != null) System.out.print(aux.head.toString()+ " ");
-			}*/
-            System.out.println();
-        }
-    }
+			System.out.println("LiveOut:");
+			for (Temp t : liveOut.get(nl.head)) {
+				System.out.print(t+" ");
+			}
+			System.out.println();
+			System.out.println();
+		}
+	}
+
 }

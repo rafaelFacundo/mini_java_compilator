@@ -7,6 +7,8 @@ import IRtree.*;
 import Temp.*;
 import utils.*;
 import Graph.*;
+import FlowGraph.*;
+import RegAlloc.*;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -8,6 +8,8 @@ import IRtree.*;
 import Temp.*;
 import utils.*;
 import Graph.*;
+import FlowGraph.*;
+import RegAlloc.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +61,18 @@ public class MyParser {
                     System.out.println(instrucoes.get(j).format(h.tmap));
                 }
 
-                System.out.println("\nFLUXO:\n");
-                AssemFlowGraph fluxo = new AssemFlowGraph(instrucoes);
-                fluxo.show(System.out);
+                System.out.println("\n* GRAFO DE FLUXO: ");
+				AssemFlowGraph graph = new AssemFlowGraph(Convert.ArrayToInstrList(instrucoes));
+				graph.print();
+
+                System.out.println("An�lise de Longevidade: ");
+				Liveness liveness = new Liveness(graph);
+				liveness.print();
+				
+				System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+				System.out.println("Grafo de Interfer�ncia: ");
+				InterferenceGraph inGraph = new InterferenceGraph(liveness);
+				inGraph.print();
             }
 
         

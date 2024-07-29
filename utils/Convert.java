@@ -5,25 +5,41 @@ import java.util.List;
 
 import Assem.Instr;
 import Assem.InstrList;
+import Temp.Temp;
 import Temp.TempList;
 import Tree.Stm;
 import Tree.StmList;
+import Tree.TEMP;
+
 
 public class Convert {
-    public static Temp.TempList ArrayToTempList(Temp.Temp array[]) {
+    public static TempList ArrayToTempList(Temp array[]) {
 
-        Temp.TempList tempList = null;
+        TempList tempList = null;
 
         for (int i = array.length-1; i >= 0; --i) {
-            tempList = new Temp.TempList(array[i], tempList);
+            tempList = new TempList(array[i], tempList);
         }
 
         return tempList;
     }
 
-    public static List<Temp.Temp> TempListToList(Temp.TempList tempList) {
+    public static List<Temp> TempListToList(TempList tempList) {
 
-        ArrayList<Temp.Temp> list = new ArrayList<Temp.Temp>();
+        ArrayList<Temp> list = new ArrayList<Temp>();
+
+        TempList temp = tempList;
+        while (temp != null) {
+            list.add(temp.head);
+            temp = temp.tail;
+        }
+
+        return list;
+    }
+
+    public static utils.List<Temp> TempListToList_(TempList tempList) {
+
+        utils.List<Temp> list = utils.List<Temp>(null, null);
 
         TempList temp = tempList;
         while (temp != null) {
@@ -46,9 +62,9 @@ public class Convert {
         return r;
     }
 
-    public static Temp.Temp[] TempListToArray(TempList tempList) {
+    public static Temp[] TempListToArray(TempList tempList) {
 
-        Temp.Temp array[] = new Temp.Temp[Convert.TempListToList(tempList).size()];
+        Temp array[] = new Temp[Convert.TempListToList(tempList).size()];
         TempList temp = tempList;
 
         for (int i = 0; i < array.length; i++) {
@@ -93,6 +109,8 @@ public class Convert {
 
         return r;
     }
+
+   
 
     public static InstrList ArrayToInstrList(List<Instr> array) {
         InstrList instrList = null;

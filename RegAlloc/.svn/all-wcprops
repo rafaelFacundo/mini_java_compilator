@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/68/trunk/CompiladorALT/src/RegAlloc
+END
+Rebuild.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/64/trunk/CompiladorALT/src/RegAlloc/Rebuild.java
+END
+InteferenceGraph.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/64/trunk/CompiladorALT/src/RegAlloc/InteferenceGraph.java
+END
+RegisterAllocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/64/trunk/CompiladorALT/src/RegAlloc/RegisterAllocation.java
+END

@@ -19,4 +19,8 @@ public class Label  {
     public Label(Symbol s) {
         this(s.toString());
     }
+
+    public String print() {
+        return name;
+    }
 }
